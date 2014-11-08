@@ -1,12 +1,12 @@
 package crypto
 
 import (
-	"fmt"
+	"aguin/utils"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"strings"
-	"aguin/utils"
 )
 
 func Test() {
@@ -23,7 +23,7 @@ func Decrypt(data string, key []byte) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("")
 	}
-	
+
 	mac := hmac.New(sha256.New, key)
 	mac.Write(message)
 	expectedMAC := mac.Sum(nil)
@@ -34,5 +34,5 @@ func Decrypt(data string, key []byte) (map[string]interface{}, error) {
 }
 
 func Encrypt(data map[string]interface{}, key []byte) {
-	
+
 }
