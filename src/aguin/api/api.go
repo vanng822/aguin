@@ -19,7 +19,7 @@ type RequestData struct {
 	data      url.Values
 }
 
-type ApplicationSetting struct {
+type AguinSetting struct {
 	dbSession *mgo.Session
 	log *log.Logger // General log
 }
@@ -66,7 +66,7 @@ func VerifyRequest() interface{} {
 
 		app := model.Application{}
 		
-		setting := ApplicationSetting{}
+		setting := AguinSetting{}
 		requestData := RequestData{}
 		setting.log = log
 		setting.dbSession = model.Session()
@@ -104,7 +104,7 @@ func VerifyRequest() interface{} {
 	}
 }
 
-func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting ApplicationSetting) {
+func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting AguinSetting) {
 	log := setting.log
 	
 	var results []model.Entity
@@ -126,7 +126,7 @@ func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, 
 	render.JSON(http.StatusOK, results)
 }
 
-func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting ApplicationSetting) {
+func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting AguinSetting) {
 	log := setting.log
 	da := []byte(requestData.data.Get("message"))
 	data3, err := utils.Bytes2json(&da)
