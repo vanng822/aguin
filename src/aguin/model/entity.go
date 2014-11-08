@@ -7,7 +7,7 @@ import (
 )
 
 type Entity struct {
-	Id        bson.ObjectId          `json:"-" bson:"_id,omitempty"`
+	Id        bson.ObjectId          `json:"id" bson:"_id,omitempty"`
 	Name      string                 `json:"entity"`
 	AppId     bson.ObjectId          `json:"-"`
 	CreatedAt time.Time              `json:"createdAt"`
