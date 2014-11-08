@@ -1,7 +1,6 @@
 package api
 
 import (
-	"aguin/backend"
 	"aguin/model"
 	"aguin/utils"
 	"aguin/validator"
@@ -22,6 +21,7 @@ type RequestData struct {
 
 type ApplicationSetting struct {
 	dbSession *mgo.Session
+	log *log.Logger // General log
 }
 
 func serveOK(render render.Render) {
@@ -45,7 +45,8 @@ func serveInternalServerError(render render.Render) {
 }
 
 func VerifyRequest() interface{} {
-	return func(c martini.Context, res http.ResponseWriter, req *http.Request, render render.Render, log *log.Logger) {
+	return func(c martini.Context, res http.ResponseWriter, req *http.Request, render render.Render) {
+		log := utils.GetLogger("aguin")
 		// Recover from panic and serve internal server error in json format
 		defer func() {
 			if r := recover(); r != nil {
@@ -67,9 +68,9 @@ func VerifyRequest() interface{} {
 		
 		setting := ApplicationSetting{}
 		requestData := RequestData{}
-		
+		setting.log = log
 		setting.dbSession = model.Session()
-
+		
 		defer setting.dbSession.Close()
 
 		err := model.AppCollection(setting.dbSession).FindId(bson.ObjectIdHex(apiKey)).One(&app)
@@ -103,11 +104,8 @@ func VerifyRequest() interface{} {
 	}
 }
 
-func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, log *log.Logger, requestData RequestData, setting ApplicationSetting) {
-	info, err := backend.Test()
-	log.Println(info)
-	log.Println(err)
-	log.Print(requestData.app, requestData.data)
+func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting ApplicationSetting) {
+	log := setting.log
 	
 	var results []model.Entity
 	da := []byte(requestData.data.Get("message"))
@@ -128,7 +126,8 @@ func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, 
 	render.JSON(http.StatusOK, results)
 }
 
-func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render, log *log.Logger, requestData RequestData, setting ApplicationSetting) {
+func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting ApplicationSetting) {
+	log := setting.log
 	da := []byte(requestData.data.Get("message"))
 	data3, err := utils.Bytes2json(&da)
 	if err != nil {
@@ -156,10 +155,10 @@ func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render,
 	serveBadRequestData(render)
 }
 
-func IndexStatus(log *log.Logger, render render.Render) {
+func IndexStatus(render render.Render) {
 	serveOK(render)
 }
 
-func NotFound(log *log.Logger, render render.Render) {
+func NotFound(render render.Render) {
 	render.JSON(http.StatusNotFound, map[string]interface{}{"status": "ERROR", "msg": "Not found"})
 }
