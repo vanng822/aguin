@@ -103,7 +103,7 @@ func VerifyRequest() interface{} {
 	}
 }
 
-func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, params martini.Params, log *log.Logger, requestData RequestData, setting ApplicationSetting) {
+func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, log *log.Logger, requestData RequestData, setting ApplicationSetting) {
 	info, err := backend.Test()
 	log.Println(info)
 	log.Println(err)
@@ -128,7 +128,7 @@ func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, 
 	render.JSON(http.StatusOK, results)
 }
 
-func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render, params martini.Params, log *log.Logger, requestData RequestData, setting ApplicationSetting) {
+func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render, log *log.Logger, requestData RequestData, setting ApplicationSetting) {
 	da := []byte(requestData.data.Get("message"))
 	data3, err := utils.Bytes2json(&da)
 	if err != nil {
