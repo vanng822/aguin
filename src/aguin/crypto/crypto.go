@@ -9,9 +9,6 @@ import (
 	"strings"
 )
 
-func Test() {
-	fmt.Println("Crypto Testing")
-}
 
 func Decrypt(data string, key []byte) (map[string]interface{}, error) {
 	parts := strings.Split(data, ".")

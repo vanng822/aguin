@@ -7,16 +7,6 @@ import (
 	"time"
 )
 
-func Test() (mgo.BuildInfo, error) {
-	conf := config.AppConf()
-	session, err := mgo.Dial(conf.Mongodb)
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-	return session.BuildInfo()
-}
-
 type MongodbBackend struct {
 	
 }
