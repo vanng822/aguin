@@ -30,7 +30,7 @@ func main() {
 	api.Get("/status", aguin_api.IndexStatus)
 	api.NotFound(aguin_api.NotFound)
 	serverConfig := config.ServerConf()
-	if port != 0 {
+	if port > 0 {
 		serverConfig.Port = port
 	}
 	if host != "" {
