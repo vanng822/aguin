@@ -6,9 +6,15 @@ import (
 	"time"
 )
 
-var validEntity = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
+var allowedChars = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
+var validObjectId = regexp.MustCompile(`^[a-f0-9]{24}$`)
+
+func ValidateObjectId(id string) bool {
+	return validObjectId.MatchString(id)
+}
+
 func ValidateEntityName(name string) string {
-	if validEntity.MatchString(name) == true {
+	if allowedChars.MatchString(name) {
 		return name
 	}
 	return ""
@@ -16,13 +22,14 @@ func ValidateEntityName(name string) string {
 
 type SearchSchema struct {
 	Validated bool
-	Entity string
+	Entity    string
 }
+
 
 func ValidateSearch(message map[string]interface{}) SearchSchema {
 	entity, _ := message["entity"].(string)
 	entity = ValidateEntityName(entity)
-	
+
 	return SearchSchema{entity != "", entity}
 }
 
@@ -38,10 +45,14 @@ func ValidateEntity(message map[string]interface{}) (string, map[string]interfac
 	data, _ := message["data"].(map[string]interface{})
 	entity, _ := message["entity"].(string)
 	newData := map[string]interface{}{}
-	
+
 	entity = ValidateEntityName(entity)
-	
+
 	for k, v := range data {
+		if !allowedChars.MatchString(k) {
+			errCounter += 1
+			continue
+		}
 		switch vv := v.(type) {
 		case int:
 			newData[k] = vv

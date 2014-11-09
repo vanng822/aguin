@@ -39,7 +39,7 @@ func VerifyRequest() interface{} {
 
 		apiKey := req.Header.Get("X-AGUIN-API-KEY")
 
-		if apiKey == "" {
+		if apiKey == "" || !validator.ValidateObjectId(apiKey) {
 			serveForbidden(render)
 			return
 		}
