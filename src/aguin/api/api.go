@@ -1,23 +1,23 @@
 package api
 
 import (
+	"aguin/crypto"
 	"aguin/model"
 	"aguin/utils"
 	"aguin/validator"
-	"aguin/crypto"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
 	"net/http"
-	"net/url"
 	"time"
 )
 
 type RequestData struct {
-	app  model.Application
-	data url.Values
+	crypted bool
+	app     model.Application
+	message map[string]interface{}
 }
 
 type AguinSetting struct {
@@ -25,37 +25,18 @@ type AguinSetting struct {
 	log       *log.Logger // General log
 }
 
-func serveOK(render render.Render) {
-	render.JSON(http.StatusOK, map[string]interface{}{"status": "OK"})
-}
-
-func serveForbidden(render render.Render) {
-	render.JSON(http.StatusForbidden, map[string]interface{}{"status": "FORBIDDEN"})
-}
-
-func serveBadRequestData(render render.Render) {
-	render.JSON(http.StatusBadRequest, map[string]interface{}{"status": "ERROR", "msg": "Invalid data"})
-}
-
-func serveBadRequestJson(render render.Render) {
-	render.JSON(http.StatusBadRequest, map[string]interface{}{"status": "ERROR", "msg": "Invalid json"})
-}
-
-func serveInternalServerError(render render.Render) {
-	render.JSON(http.StatusInternalServerError, map[string]interface{}{"status": "ERROR"})
-}
-
 func VerifyRequest() interface{} {
 	return func(c martini.Context, res http.ResponseWriter, req *http.Request, render render.Render) {
 		log := utils.GetLogger("aguin")
 		// Recover from panic and serve internal server error in json format
-		/*defer func() {
-			if r := recover(); r != nil {
-				log.Print(r)
+		defer func() {
+			if err := recover(); err != nil {
+				stack := utils.Stack(3)
+				log.Printf("PANIC: %s\n%s", err, stack)
 				serveInternalServerError(render)
 			}
 		}()
-*/
+
 		apiKey := req.Header.Get("X-AGUIN-API-KEY")
 
 		if apiKey == "" {
@@ -90,16 +71,31 @@ func VerifyRequest() interface{} {
 		// if secret empty it must be crypted
 		if apiSecret == "" {
 			// decrypting data here
-
+			decryptedMessage, err := crypto.Decrypt(req.Form.Get("message"), []byte(app.Secret))
+			if err != nil {
+				setting.log.Print(err, req.Form.Get("message"))
+				serveInternalServerError(render)
+				return
+			}
+			requestData.message = decryptedMessage.(map[string]interface{})
+			requestData.crypted = true
 		} else {
 			// have secret, compare with the one in database
 			if apiSecret != app.Secret {
 				serveForbidden(render)
 				return
 			}
+			data3, err := utils.Bytes2json([]byte(req.Form.Get("message")))
+			if err != nil {
+				setting.log.Print(err)
+				serveBadRequestJson(render)
+				return
+			}
+			requestData.message = data3.(map[string]interface{})
+			requestData.crypted = false
 		}
-		requestData.data = req.Form
-		setting.log.Print(requestData.data)
+
+		setting.log.Print(requestData.message)
 		c.Map(requestData)
 		c.Map(setting)
 		c.Next()
@@ -107,50 +103,32 @@ func VerifyRequest() interface{} {
 }
 
 func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting AguinSetting) {
-	log := setting.log
-
 	var results []model.Entity
-	da := []byte(requestData.data.Get("message"))
 
-	data3, err := utils.Bytes2json(&da)
-	if err != nil {
-		log.Print(err)
-		serveBadRequestJson(render)
-		return
-	}
-	criteria := validator.ValidateSearch(data3.(map[string]interface{}))
+	criteria := validator.ValidateSearch(requestData.message)
 	if criteria.Validated == false {
 		serveBadRequestData(render)
 		return
 	}
-	err = model.EntityCollection(setting.dbSession).Find(bson.M{"name": criteria.Entity, "appid": requestData.app.Id}).All(&results)
-	crypted, err := crypto.Encrypt(results, []byte(requestData.app.Secret))
+	err := model.EntityCollection(setting.dbSession).Find(bson.M{"name": criteria.Entity, "appid": requestData.app.Id}).All(&results)
 	if err != nil {
-		setting.log.Print(err)
+		setting.log.Println(err)
 		serveInternalServerError(render)
 		return
 	}
-	setting.log.Print(crypted)
-	render.JSON(http.StatusOK, map[string]interface{}{"result": crypted})
+	ServeResponse(http.StatusOK, render, results, requestData, setting)
 }
 
 func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting AguinSetting) {
 	log := setting.log
-	da := []byte(requestData.data.Get("message"))
-	data3, err := utils.Bytes2json(&da)
-	if err != nil {
-		log.Print(err)
-		serveBadRequestJson(render)
-		return
-	}
-	entity, data, validated := validator.ValidateEntity(data3.(map[string]interface{}))
+	entity, data, validated := validator.ValidateEntity(requestData.message)
 	if validated && entity != "" {
 		doc := model.Entity{}
 		doc.Name = entity
 		doc.AppId = requestData.app.Id
 		doc.CreatedAt = time.Now()
 		doc.Data = data
-		err = doc.Save(setting.dbSession)
+		err := doc.Save(setting.dbSession)
 		if err == nil {
 			serveOK(render)
 			return
@@ -168,5 +146,51 @@ func IndexStatus(render render.Render) {
 }
 
 func NotFound(render render.Render) {
-	render.JSON(http.StatusNotFound, map[string]interface{}{"status": "ERROR", "msg": "Not found"})
+	serveNotFound(render)
+}
+
+/* Serving responses */
+func ServeResponse(status int, render render.Render, result interface{}, requestData RequestData, setting AguinSetting) {
+	if requestData.crypted {
+		ServeSignedResponse(status, render, result, requestData, setting)
+	} else {
+		ServeUnsignedResponse(status, render, result, requestData, setting)
+	}
+}
+
+func ServeUnsignedResponse(status int, render render.Render, result interface{}, requestData RequestData, setting AguinSetting) {
+	render.JSON(status, map[string]interface{}{"result": result, "encrypted": false})
+}
+
+func ServeSignedResponse(status int, render render.Render, result interface{}, requestData RequestData, setting AguinSetting) {
+	cryptedResult, err := crypto.Encrypt(result, []byte(requestData.app.Secret))
+	if err != nil {
+		serveInternalServerError(render)
+		return
+	}
+	render.JSON(status, map[string]interface{}{"result": cryptedResult, "encrypted": true})
+}
+
+func serveOK(render render.Render) {
+	render.JSON(http.StatusOK, map[string]interface{}{"result": map[string]interface{}{"status": "OK"}, "encrypted": false})
+}
+
+func serveForbidden(render render.Render) {
+	render.JSON(http.StatusForbidden, map[string]interface{}{"result": map[string]interface{}{"status": "FORBIDDEN"}, "encrypted": false})
+}
+
+func serveBadRequestData(render render.Render) {
+	render.JSON(http.StatusBadRequest, map[string]interface{}{"result": map[string]interface{}{"status": "ERROR", "msg": "Invalid data"}, "encrypted": false})
+}
+
+func serveBadRequestJson(render render.Render) {
+	render.JSON(http.StatusBadRequest, map[string]interface{}{"result": map[string]interface{}{"status": "ERROR", "msg": "Invalid json"}, "encrypted": false})
+}
+
+func serveInternalServerError(render render.Render) {
+	render.JSON(http.StatusInternalServerError, map[string]interface{}{"result": map[string]interface{}{"status": "ERROR", "msg": "Internal server error"}, "encrypted": false})
+}
+
+func serveNotFound(render render.Render) {
+	render.JSON(http.StatusNotFound, map[string]interface{}{"result": map[string]interface{}{"status": "ERROR", "msg": "Not found"}, "encrypted": false})
 }

@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 )
 
-func Bytes2json(data *[]byte) (interface{}, error) {
+func Bytes2json(data []byte) (interface{}, error) {
 	var jsonData interface{}
 
-	err := json.Unmarshal(*data, &jsonData)
+	err := json.Unmarshal(data, &jsonData)
 
 	if err != nil {
 		return nil, err

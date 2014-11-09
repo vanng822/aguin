@@ -15,34 +15,39 @@ func Decrypt(data string, key []byte) (interface{}, error) {
 	if len(parts) != 2 {
 		return nil, fmt.Errorf("")
 	}
-	messageMAC := []byte(Urldecode(parts[0]))
+	messageMAC, err := base64.StdEncoding.DecodeString(Urldecode(parts[0]))
+	if err != nil {
+		return nil, fmt.Errorf("Invalid data")
+	}
 	message, err := base64.StdEncoding.DecodeString(Urldecode(parts[1]))
 	if err != nil {
-		return nil, fmt.Errorf("")
+		return nil, fmt.Errorf("Invalid data")
 	}
 
 	mac := hmac.New(sha256.New, key)
 	mac.Write(message)
 	expectedMAC := mac.Sum(nil)
-	if hmac.Equal(messageMAC, expectedMAC) == true {
-		return utils.Bytes2json(&message)
+	if hmac.Equal(messageMAC, expectedMAC) {
+		return utils.Bytes2json(message)
 	}
-	return nil, fmt.Errorf("")
+	return nil, fmt.Errorf("Invalid signed request")
 }
 
+/*
+* Data from server to client shouldn't be a problem with + and /
+* but we encode it anyways so we can use this logic for both server and client side
+*/
 func Encrypt(data interface{}, key []byte) (string, error) {
-	jdata, err := utils.Json2bytes(data)
+	message, err := utils.Json2bytes(data)
 	if err != nil {
 		return "", nil
 	}
-	
 	mac := hmac.New(sha256.New, key)
-	message := base64.StdEncoding.EncodeToString(jdata)
-	
-	mac.Write([]byte(message))
+	mac.Write(message)
 	expectedMAC := mac.Sum(nil)
 	expectedMACBase64 := base64.StdEncoding.EncodeToString(expectedMAC)
-	return fmt.Sprintf("%s.%s", Urlencode(expectedMACBase64), Urlencode(message)), nil
+	messageBase64 := base64.StdEncoding.EncodeToString(message)
+	return fmt.Sprintf("%s.%s", Urlencode(expectedMACBase64), Urlencode(messageBase64)), nil
 }
 
 
