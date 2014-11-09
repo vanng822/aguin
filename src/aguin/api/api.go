@@ -52,13 +52,8 @@ func VerifyRequest() interface{} {
 		requestData := RequestData{}
 		setting.log = log
 		setting.dbSession = model.Session()
-
 		defer setting.dbSession.Close()
-
 		err := model.AppCollection(setting.dbSession).FindId(bson.ObjectIdHex(apiKey)).One(&app)
-
-		log.Print(app, err)
-
 		if err != nil {
 			serveForbidden(render)
 			return
@@ -95,8 +90,6 @@ func VerifyRequest() interface{} {
 			requestData.message = data3.(map[string]interface{})
 			requestData.crypted = false
 		}
-
-		setting.log.Print(requestData.message)
 		c.Map(requestData)
 		c.Map(setting)
 		c.Next()
