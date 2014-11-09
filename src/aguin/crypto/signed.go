@@ -52,12 +52,10 @@ func Encrypt(data interface{}, key []byte) (string, error) {
 
 
 func Urlencode(base64String string) string {
-	base64String = strings.Replace(base64String, "+", "-", -1)
-	return strings.Replace(base64String, "/", "_", -1)
+	return strings.NewReplacer("+", "-", "/", "_").Replace(base64String)
 }
 
 func Urldecode(base64String string) string {
-	base64String = strings.Replace(base64String, "-", "+", -1)
-	return strings.Replace(base64String, "_", "/", -1)
+	return strings.NewReplacer("-", "+", "_", "/").Replace(base64String)
 }
 
