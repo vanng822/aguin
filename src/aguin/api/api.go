@@ -71,7 +71,8 @@ func VerifyRequest() interface{} {
 		// if secret empty it must be crypted
 		if apiSecret == "" {
 			// decrypting data here
-			decryptedMessage, err := crypto.Decrypt(req.Form.Get("message"), []byte(app.Secret))
+			authKey := []byte(app.Secret)
+			decryptedMessage, err := crypto.Decrypt(req.Form.Get("message"), authKey, authKey)
 			if err != nil {
 				setting.log.Print(err, req.Form.Get("message"))
 				serveInternalServerError(render)
@@ -163,7 +164,8 @@ func ServeUnsignedResponse(status int, render render.Render, result interface{},
 }
 
 func ServeSignedResponse(status int, render render.Render, result interface{}, requestData RequestData, setting AguinSetting) {
-	cryptedResult, err := crypto.Encrypt(result, []byte(requestData.app.Secret))
+	authKey := []byte(requestData.app.Secret)
+	cryptedResult, err := crypto.Encrypt(result, authKey, authKey)
 	if err != nil {
 		serveInternalServerError(render)
 		return

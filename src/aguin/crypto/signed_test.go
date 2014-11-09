@@ -3,17 +3,17 @@ package crypto
 import (
 	"testing"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestDecrypt(t *testing.T) {
-	t.Fail()
-}
-
 func TestEncrypt(t *testing.T) {
-	res, _ := Encrypt(map[string]interface{}{"entity": "something2"}, []byte("123123123123123123123123213213"))
+	authKey := []byte("545e0716f2fea0c7a9c46c74fec46c71")
+	expected := map[string]interface{}{"entity": "something2"}
+	res, _ := Encrypt(expected, authKey, authKey)
 	fmt.Println(res)
-	r, err := Decrypt(res, []byte("123123123123123123123123213213"))
+	r, err := Decrypt(res, authKey, authKey)
 	fmt.Println(r, err)
+	assert.Equal(t, expected, r)
 }
 
 
