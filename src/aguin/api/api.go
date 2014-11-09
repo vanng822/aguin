@@ -4,6 +4,7 @@ import (
 	"aguin/model"
 	"aguin/utils"
 	"aguin/validator"
+	"aguin/crypto"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
 	"gopkg.in/mgo.v2"
@@ -15,13 +16,13 @@ import (
 )
 
 type RequestData struct {
-	app       model.Application
-	data      url.Values
+	app  model.Application
+	data url.Values
 }
 
 type AguinSetting struct {
 	dbSession *mgo.Session
-	log *log.Logger // General log
+	log       *log.Logger // General log
 }
 
 func serveOK(render render.Render) {
@@ -48,13 +49,13 @@ func VerifyRequest() interface{} {
 	return func(c martini.Context, res http.ResponseWriter, req *http.Request, render render.Render) {
 		log := utils.GetLogger("aguin")
 		// Recover from panic and serve internal server error in json format
-		defer func() {
+		/*defer func() {
 			if r := recover(); r != nil {
 				log.Print(r)
 				serveInternalServerError(render)
 			}
 		}()
-	
+*/
 		apiKey := req.Header.Get("X-AGUIN-API-KEY")
 
 		if apiKey == "" {
@@ -65,12 +66,12 @@ func VerifyRequest() interface{} {
 		apiSecret := req.Header.Get("X-AGUIN-API-SECRET")
 
 		app := model.Application{}
-		
+
 		setting := AguinSetting{}
 		requestData := RequestData{}
 		setting.log = log
 		setting.dbSession = model.Session()
-		
+
 		defer setting.dbSession.Close()
 
 		err := model.AppCollection(setting.dbSession).FindId(bson.ObjectIdHex(apiKey)).One(&app)
@@ -98,6 +99,7 @@ func VerifyRequest() interface{} {
 			}
 		}
 		requestData.data = req.Form
+		setting.log.Print(requestData.data)
 		c.Map(requestData)
 		c.Map(setting)
 		c.Next()
@@ -106,24 +108,30 @@ func VerifyRequest() interface{} {
 
 func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting AguinSetting) {
 	log := setting.log
-	
+
 	var results []model.Entity
 	da := []byte(requestData.data.Get("message"))
-	
+
 	data3, err := utils.Bytes2json(&da)
 	if err != nil {
 		log.Print(err)
 		serveBadRequestJson(render)
 		return
 	}
-	criteria := validator.ValidateSearch(data3)
+	criteria := validator.ValidateSearch(data3.(map[string]interface{}))
 	if criteria.Validated == false {
 		serveBadRequestData(render)
 		return
 	}
 	err = model.EntityCollection(setting.dbSession).Find(bson.M{"name": criteria.Entity, "appid": requestData.app.Id}).All(&results)
-	
-	render.JSON(http.StatusOK, results)
+	crypted, err := crypto.Encrypt(results, []byte(requestData.app.Secret))
+	if err != nil {
+		setting.log.Print(err)
+		serveInternalServerError(render)
+		return
+	}
+	setting.log.Print(crypted)
+	render.JSON(http.StatusOK, map[string]interface{}{"result": crypted})
 }
 
 func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting AguinSetting) {
@@ -135,7 +143,7 @@ func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render,
 		serveBadRequestJson(render)
 		return
 	}
-	entity, data, validated := validator.ValidateEntity(data3)
+	entity, data, validated := validator.ValidateEntity(data3.(map[string]interface{}))
 	if validated && entity != "" {
 		doc := model.Entity{}
 		doc.Name = entity
