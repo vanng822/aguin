@@ -9,7 +9,7 @@ import (
 var allowedChars = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
 var validObjectId = regexp.MustCompile(`^[a-f0-9]{24}$`)
 
-func ValidateObjectId(id string) bool {
+func ValidObjectId(id string) bool {
 	return validObjectId.MatchString(id)
 }
 
@@ -88,5 +88,5 @@ func ValidateEntity(message map[string]interface{}) (string, map[string]interfac
 	if errCounter > 0 {
 		return entity, map[string]interface{}{}, false
 	}
-	return entity, newData, len(data) > 0
+	return entity, newData, len(newData) > 0
 }
