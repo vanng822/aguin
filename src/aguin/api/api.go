@@ -101,6 +101,7 @@ func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, 
 
 	criteria := validator.ValidateSearch(requestData.message)
 	if criteria.Validated == false {
+		setting.log.Print(requestData.message)
 		serveBadRequestData(render)
 		return
 	}
@@ -132,6 +133,7 @@ func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render,
 			return
 		}
 	}
+	setting.log.Print(requestData.message)
 	serveBadRequestData(render)
 }
 
