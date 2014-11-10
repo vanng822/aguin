@@ -25,7 +25,6 @@ type SearchSchema struct {
 	Entity    string
 }
 
-
 func ValidateSearch(message map[string]interface{}) SearchSchema {
 	entity, _ := message["entity"].(string)
 	entity = ValidateEntityName(entity)
@@ -72,7 +71,9 @@ func ValidateEntity(message map[string]interface{}) (string, map[string]interfac
 					errCounter += 1
 				}
 			}
-			newData[k] = newArr
+			if len(newArr) > 0 {
+				newData[k] = newArr
+			}
 		case string:
 			vvv, err := time.Parse("2006-01-02 03:04:01", vv)
 			if err != nil {
