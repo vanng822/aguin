@@ -3,7 +3,6 @@ package model
 import (
 	"aguin/config"
 	"gopkg.in/mgo.v2"
-	"time"
 )
 
 func Session() *mgo.Session {
@@ -25,11 +24,4 @@ func AppCollection(session *mgo.Session) *mgo.Collection {
 
 func EntityCollection(session *mgo.Session) *mgo.Collection {
 	return session.DB("").C("entity")
-}
-
-
-type IModel interface {
-	Save(data interface{}) error
-	Get(fromDate, toDate time.Time) interface{}
-	Update(date time.Time, data map[string]interface{}) error
 }
