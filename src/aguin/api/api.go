@@ -5,6 +5,7 @@ import (
 	"aguin/model"
 	"aguin/utils"
 	"aguin/validator"
+	"aguin/config"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
 	"gopkg.in/mgo.v2"
@@ -36,7 +37,7 @@ func VerifyRequest() interface{} {
 				serveInternalServerError(render)
 			}
 		}()
-
+		appConfig := config.AppConf()
 		apiKey := req.Header.Get("X-AGUIN-API-KEY")
 
 		if apiKey == "" || !validator.ValidObjectId(apiKey) {
@@ -64,7 +65,7 @@ func VerifyRequest() interface{} {
 		// parse form for data
 		req.ParseForm()
 		// if secret empty it must be crypted
-		if apiSecret == "" {
+		if appConfig.EncryptionEnabled {
 			// decrypting data here
 			authKey := []byte(app.Secret)
 			decryptedMessage, err := crypto.Decrypt(req.Form.Get("message"), authKey, authKey)

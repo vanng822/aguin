@@ -8,8 +8,7 @@ import (
 
 type AppConfig struct {
 	Mongodb string
-	EncryptResponse bool
-	CryptedRequest bool
+	EncryptionEnabled bool
 }
 
 type ServerConfig struct {
