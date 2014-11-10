@@ -43,13 +43,21 @@ func ReadConfig(path string) {
 }
 
 func ReadAppConfig(filename string) error {
-	file, _ := os.Open(filename)
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 	decoder := json.NewDecoder(file)
 	return decoder.Decode(&app)
 }
 
 func ReadServerConfig(filename string) error {
-	file, _ := os.Open(filename)
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 	decoder := json.NewDecoder(file)
 	return decoder.Decode(&server)
 }
