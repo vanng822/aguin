@@ -97,14 +97,13 @@ func VerifyRequest() interface{} {
 }
 
 func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting AguinSetting) {
-	var results []model.Entity
-
 	criteria := validator.ValidateSearch(requestData.message)
 	if criteria.Validated == false {
 		setting.log.Print(requestData.message)
 		serveBadRequestData(render)
 		return
 	}
+	var results []model.Entity
 	err := model.EntityCollection(setting.dbSession).Find(bson.M{"name": criteria.Entity, "appid": requestData.app.Id}).All(&results)
 	if err != nil {
 		setting.log.Println(err)
@@ -115,7 +114,6 @@ func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, 
 }
 
 func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting AguinSetting) {
-	log := setting.log
 	entity, data, validated := validator.ValidateEntity(requestData.message)
 	if validated && entity != "" {
 		doc := model.Entity{}
@@ -128,7 +126,7 @@ func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render,
 			serveOK(render)
 			return
 		} else {
-			log.Print(err)
+			setting.log.Print(err)
 			serveInternalServerError(render)
 			return
 		}
