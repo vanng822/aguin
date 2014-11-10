@@ -5,13 +5,22 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
-func Session() *mgo.Session {
+var session *mgo.Session
+
+func Dial() *mgo.Session {
 	conf := config.AppConf()
 	session, err := mgo.Dial(conf.Mongodb)
 	if err != nil {
 		panic(err)
 	}
 	return session
+}
+
+func Session() *mgo.Session {
+	if session == nil {
+		session = Dial()
+	}
+	return session.New()
 }
 
 func UserCollection(session *mgo.Session) *mgo.Collection {
