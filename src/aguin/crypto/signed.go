@@ -14,7 +14,7 @@ func Decrypt(data string, authKey, aesKey []byte) (interface{}, error) {
 	if len(parts) != 2 {
 		return nil, fmt.Errorf("Signed data must contain base64_sig.base64_data")
 	}
-	messageMAC, err := base64.StdEncoding.DecodeString(Urldecode(parts[0]))
+	expectedMAC, err := base64.StdEncoding.DecodeString(Urldecode(parts[0]))
 	if err != nil {
 		return nil, fmt.Errorf("Invalid data")
 	}
@@ -25,7 +25,7 @@ func Decrypt(data string, authKey, aesKey []byte) (interface{}, error) {
 
 	mac := hmac.New(sha256.New, authKey)
 	mac.Write(message)
-	expectedMAC := mac.Sum(nil)
+	messageMAC := mac.Sum(nil)
 	if hmac.Equal(messageMAC, expectedMAC) {
 		return utils.Bytes2json(AESDecrypt(message, aesKey))
 	}
@@ -37,7 +37,6 @@ func Decrypt(data string, authKey, aesKey []byte) (interface{}, error) {
 * but we encode it anyways so we can use this logic for both server and client side
  */
 func Encrypt(data interface{}, authKey, aesKey []byte) (string, error) {
-	// should have different key for those :-p
 	message, err := utils.Json2bytes(data)
 	if err != nil {
 		return "", fmt.Errorf("Invalid data")
