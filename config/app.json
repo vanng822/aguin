@@ -1,0 +1,5 @@
+{
+	"Mongodb": "localhost:27017/aguin",
+	"EncryptResponse": true,
+	"CryptedRequest": false
+}
