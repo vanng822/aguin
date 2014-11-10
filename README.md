@@ -1,0 +1,11 @@
+aguin
+=====
+
+For collecting daily/weekly stats of different kind. They should be simple data structure of integer or float.
+
+The data can be sent signed encrypted using HMAC/AES or just not if your channel is already secure.
+
+
+You need to have mongodb installed, http://www.mongodb.org/, for storing the data.
+
+You need Go to run/compile this program http://golang.org/
