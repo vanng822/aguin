@@ -18,7 +18,7 @@ type ServerConfig struct {
 }
 
 var (
-	app  AppConfig
+	app AppConfig
 	server ServerConfig
 	configPath string
 )
@@ -36,8 +36,8 @@ func AppConf() AppConfig {
 
 func ReadConfig(path string) {
 	configPath = strings.TrimRight(path, "/")
-	merr := ReadAppConfig(fmt.Sprintf("%s/app.json", configPath))
 	serr := ReadServerConfig(fmt.Sprintf("%s/conf.json", configPath))
+	merr := ReadAppConfig(fmt.Sprintf("%s/app.json", configPath))
 	if merr != nil || serr != nil {
 		panic(fmt.Sprintf("Can not load configuration:%s/app.json or %s/conf.json", configPath, configPath))
 	}
