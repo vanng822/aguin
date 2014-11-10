@@ -64,7 +64,6 @@ func VerifyRequest() interface{} {
 
 		// parse form for data
 		req.ParseForm()
-		// if secret empty it must be crypted
 		if appConfig.EncryptionEnabled {
 			// decrypting data here
 			authKey := []byte(app.Secret)
