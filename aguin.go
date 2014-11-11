@@ -20,10 +20,14 @@ func main() {
 	log := utils.GetLogger("system")
 	flag.StringVar(&host, "h", "", "Host to listen on")
 	flag.IntVar(&port, "p", 0, "Port number to listen on")
-	flag.StringVar(&configPath, "c", "./config", "Path to configurations")
+	flag.StringVar(&configPath, "c", "", "Path to configurations")
 	
 	flag.Parse()
-	config.ReadConfig(configPath)
+	if configPath != "" {
+		config.SetConfigPath(configPath)
+	}
+	config.ReadConfig()
+	
 	api := martini.Classic()
 	api.Use(render.Renderer())
 	api.Use(aguin_api.VerifyRequest())

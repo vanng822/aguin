@@ -33,8 +33,11 @@ func AppConf() AppConfig {
 	return app
 }
 
-func ReadConfig(path string) {
+func SetConfigPath(path string) {
 	configPath = strings.TrimRight(path, "/")
+}
+
+func ReadConfig() {
 	serr := ReadServerConfig(fmt.Sprintf("%s/conf.json", configPath))
 	merr := ReadAppConfig(fmt.Sprintf("%s/app.json", configPath))
 	if merr != nil || serr != nil {
