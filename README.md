@@ -12,8 +12,8 @@ You need Go to run/compile this program http://golang.org/
 
 You need to install packages
 
-  go get github.com/go-martini/martini
-  
-  go get github.com/martini-contrib/render
-  
-  go get gopkg.in/mgo.v2
+	go get github.com/go-martini/martini
+	
+	go get github.com/martini-contrib/render
+	
+	go get gopkg.in/mgo.v2
