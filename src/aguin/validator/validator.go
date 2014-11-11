@@ -32,7 +32,13 @@ func ValidateSearch(message map[string]interface{}) SearchSchema {
 	return SearchSchema{entity != "", entity}
 }
 
-func ValidateEntity(message map[string]interface{}) (string, map[string]interface{}, bool) {
+type EntitySchema struct {
+	Validated bool
+	Entity string
+	Data map[string]interface{}
+}
+
+func ValidateEntity(message map[string]interface{}) EntitySchema {
 	/*Allow type:
 	int
 	float
@@ -45,8 +51,8 @@ func ValidateEntity(message map[string]interface{}) (string, map[string]interfac
 	entity, _ := message["entity"].(string)
 	newData := map[string]interface{}{}
 
-	entity = ValidateEntityName(entity)
-
+	result := EntitySchema{}
+	result.Entity = ValidateEntityName(entity)
 	for k, v := range data {
 		if !allowedChars.MatchString(k) {
 			errCounter += 1
@@ -87,7 +93,9 @@ func ValidateEntity(message map[string]interface{}) (string, map[string]interfac
 		}
 	}
 	if errCounter > 0 {
-		return entity, map[string]interface{}{}, false
+		result.Validated = false
+	} else {
+		result.Validated = len(newData) > 0
 	}
-	return entity, newData, len(newData) > 0
+	return result
 }

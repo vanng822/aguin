@@ -114,13 +114,13 @@ func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, 
 }
 
 func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting AguinSetting) {
-	entity, data, validated := validator.ValidateEntity(requestData.message)
-	if validated && entity != "" {
+	result := validator.ValidateEntity(requestData.message)
+	if result.Validated && result.Entity != "" {
 		doc := model.Entity{}
-		doc.Name = entity
+		doc.Name = result.Entity
 		doc.AppId = requestData.app.Id
 		doc.CreatedAt = time.Now()
-		doc.Data = data
+		doc.Data = result.Data
 		err := doc.Save(setting.dbSession)
 		if err == nil {
 			serveOK(render)
