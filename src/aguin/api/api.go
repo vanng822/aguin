@@ -36,7 +36,7 @@ func VerifyRequest() interface{} {
 				serveInternalServerError(render)
 			}
 		}()
-		appConfig := config.AppConf()
+	
 		apiKey := req.Header.Get("X-AGUIN-API-KEY")
 
 		if apiKey == "" || !validator.ValidAPIKey(apiKey) {
@@ -63,7 +63,7 @@ func VerifyRequest() interface{} {
 
 		// parse form for data
 		req.ParseForm()
-		if appConfig.EncryptionEnabled {
+		if config.AppConf().EncryptionEnabled {
 			// decrypting data here
 			authKey := []byte(app.Secret)
 			decryptedMessage, err := crypto.Decrypt(req.Form.Get("message"), authKey, authKey)
