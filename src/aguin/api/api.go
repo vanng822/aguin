@@ -40,7 +40,7 @@ func VerifyRequest() interface{} {
 		appConfig := config.AppConf()
 		apiKey := req.Header.Get("X-AGUIN-API-KEY")
 
-		if apiKey == "" || !validator.ValidObjectId(apiKey) {
+		if apiKey == "" || !validator.ValidAPIKey(apiKey) {
 			serveForbidden(render)
 			return
 		}

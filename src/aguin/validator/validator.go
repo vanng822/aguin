@@ -7,10 +7,10 @@ import (
 )
 
 var allowedChars = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
-var validObjectId = regexp.MustCompile(`^[a-f0-9]{24}$`)
+var validAPIKey = regexp.MustCompile(`^[a-f0-9]{24}$`)
 
-func ValidObjectId(id string) bool {
-	return validObjectId.MatchString(id)
+func ValidAPIKey(id string) bool {
+	return validAPIKey.MatchString(id)
 }
 
 func ValidateEntityName(name string) string {
