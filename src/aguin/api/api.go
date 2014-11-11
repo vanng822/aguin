@@ -10,7 +10,6 @@ import (
 	"github.com/martini-contrib/render"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 	"net/http"
 	"time"
 )
@@ -23,7 +22,7 @@ type RequestData struct {
 
 type AguinSetting struct {
 	dbSession *mgo.Session
-	log       *log.Logger // General log
+	log       *utils.Logger // General log
 }
 
 func VerifyRequest() interface{} {
@@ -33,7 +32,7 @@ func VerifyRequest() interface{} {
 		defer func() {
 			if err := recover(); err != nil {
 				stack := utils.Stack(3)
-				log.Printf("PANIC: %s\n%s", err, stack)
+				log.Error("PANIC: %s\n%s", err, stack)
 				serveInternalServerError(render)
 			}
 		}()
@@ -69,7 +68,7 @@ func VerifyRequest() interface{} {
 			authKey := []byte(app.Secret)
 			decryptedMessage, err := crypto.Decrypt(req.Form.Get("message"), authKey, authKey)
 			if err != nil {
-				setting.log.Print(err, req.Form.Get("message"))
+				setting.log.Error("error: %v, message: %v", err, req.Form.Get("message"))
 				serveInternalServerError(render)
 				return
 			}
@@ -83,7 +82,7 @@ func VerifyRequest() interface{} {
 			}
 			data3, err := utils.Bytes2json([]byte(req.Form.Get("message")))
 			if err != nil {
-				setting.log.Print(err)
+				setting.log.Error("%v", err)
 				serveBadRequestJson(render)
 				return
 			}
@@ -99,14 +98,14 @@ func VerifyRequest() interface{} {
 func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting AguinSetting) {
 	criteria := validator.ValidateSearch(requestData.message)
 	if criteria.Validated == false {
-		setting.log.Print(requestData.message)
+		setting.log.Info("%v", requestData.message)
 		serveBadRequestData(render)
 		return
 	}
 	var results []model.Entity
 	err := model.EntityCollection(setting.dbSession).Find(bson.M{"name": criteria.Entity, "appid": requestData.app.Id}).All(&results)
 	if err != nil {
-		setting.log.Println(err)
+		setting.log.Error("%v", err)
 		serveInternalServerError(render)
 		return
 	}
@@ -126,12 +125,12 @@ func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render,
 			serveOK(render)
 			return
 		} else {
-			setting.log.Print(err)
+			setting.log.Error("%v", err)
 			serveInternalServerError(render)
 			return
 		}
 	}
-	setting.log.Print(requestData.message)
+	setting.log.Info("%v", requestData.message)
 	serveBadRequestData(render)
 }
 

@@ -45,6 +45,6 @@ func main() {
 	if host != "" {
 		serverConfig.Host = host
 	}
-	log.Print(fmt.Sprintf("listening to address %s:%d", serverConfig.Host, serverConfig.Port))
+	log.Info("listening to address %s:%d", serverConfig.Host, serverConfig.Port)
 	http.ListenAndServe(fmt.Sprintf("%s:%d", serverConfig.Host, serverConfig.Port), api)
 }
