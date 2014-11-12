@@ -6,12 +6,13 @@ import(
 	"io"
 )
 func AESDecrypt(message []byte, key []byte) []byte {
+	if len(message) < aes.BlockSize {
+		panic("Message too short")
+	}
+	
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
-	}
-	if len(message) < aes.BlockSize {
-		panic("Message too short")
 	}
 	
 	iv := message[:aes.BlockSize]
