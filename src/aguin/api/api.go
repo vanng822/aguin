@@ -1,11 +1,11 @@
 package api
 
 import (
+	"aguin/config"
 	"aguin/crypto"
 	"aguin/model"
 	"aguin/utils"
 	"aguin/validator"
-	"aguin/config"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
 	"gopkg.in/mgo.v2"
@@ -15,7 +15,6 @@ import (
 )
 
 type RequestData struct {
-	crypted bool
 	app     model.Application
 	message map[string]interface{}
 }
@@ -23,6 +22,7 @@ type RequestData struct {
 type AguinSetting struct {
 	dbSession *mgo.Session
 	log       *utils.Logger // General log
+	conf      *config.AppConfig
 }
 
 func VerifyRequest() interface{} {
@@ -36,7 +36,7 @@ func VerifyRequest() interface{} {
 				serveInternalServerError(render)
 			}
 		}()
-	
+
 		apiKey := req.Header.Get("X-AGUIN-API-KEY")
 
 		if apiKey == "" || !validator.ValidAPIKey(apiKey) {
@@ -60,10 +60,10 @@ func VerifyRequest() interface{} {
 		}
 
 		requestData.app = app
-
+		setting.conf = config.AppConf()
 		// parse form for data
 		req.ParseForm()
-		if config.AppConf().EncryptionEnabled {
+		if setting.conf.EncryptionEnabled {
 			// decrypting data here
 			authKey := []byte(app.Secret)
 			decryptedMessage, err := crypto.Decrypt(req.Form.Get("message"), authKey, authKey)
@@ -73,7 +73,6 @@ func VerifyRequest() interface{} {
 				return
 			}
 			requestData.message = decryptedMessage.(map[string]interface{})
-			requestData.crypted = true
 		} else {
 			// have secret, compare with the one in database
 			if apiSecret != app.Secret {
@@ -87,7 +86,6 @@ func VerifyRequest() interface{} {
 				return
 			}
 			requestData.message = data3.(map[string]interface{})
-			requestData.crypted = false
 		}
 		c.Map(requestData)
 		c.Map(setting)
@@ -144,7 +142,7 @@ func NotFound(render render.Render) {
 
 /* Serving responses */
 func ServeResponse(status int, render render.Render, result interface{}, requestData RequestData, setting AguinSetting) {
-	if requestData.crypted {
+	if setting.conf.EncryptionEnabled {
 		ServeSignedResponse(status, render, result, requestData, setting)
 	} else {
 		ServeUnsignedResponse(status, render, result, requestData, setting)
