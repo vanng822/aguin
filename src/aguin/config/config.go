@@ -25,12 +25,12 @@ var (
 func init() {
 	configPath = "./config"
 }
-func ServerConf() ServerConfig {
-	return server
+func ServerConf() *ServerConfig {
+	return &server
 }
 
-func AppConf() AppConfig {
-	return app
+func AppConf() *AppConfig {
+	return &app
 }
 
 func SetConfigPath(path string) {
