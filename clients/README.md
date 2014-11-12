@@ -24,7 +24,7 @@ Base64 urldecode:
 API:
 
 1. GET: Getting records for an certain Entity
-2. POST: creating new Entity entry
+2. POST: creating new Entity entry. Entity should be in json format and sent as parameter message.
 
 All API calls must make with a header X-AGUIN-API-KEY and an optional header X-AGUIN-API-SECRET. Secret header should only send if you have https.
 
