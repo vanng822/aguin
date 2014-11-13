@@ -1,7 +1,7 @@
 
 Encrypt:
 
-1. AES encrypt data with 256-bit key, CFB mode
+1. AES encrypt data with 256-bit key, CFB mode and autopadding
 2. Signed it with hmac/sha256
 3. Urlencoded base64 on both data/message and expected signature
 4. Concat the message in format: base64_expected_signature.base64_encrypted_message
