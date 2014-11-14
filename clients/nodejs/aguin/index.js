@@ -51,11 +51,22 @@ Aguin.prototype = {
 		options.path = '/?message=' + encodeURIComponent(this.encrypt({entity:entity, data: data}));
 		this.request(options, callback);
 	},
-	get: function(criteria, callback) {
+	get: function(entity, criteria, callback) {
 		var options = url.parse(this.url);
+		var data;
 		options.method = 'GET';
 		options.headers = {'X-AGUIN-API-KEY': this.apiKey};
-		options.path = '/?message=' + encodeURIComponent(this.encrypt(criteria));
+		if (!callback) {
+			callback = criteria;
+			criteria = null;
+		}
+		if (criteria) {
+			data = criteria;
+		} else {
+			data = {};
+		}
+		data.entity = entity;
+		options.path = '/?message=' + encodeURIComponent(this.encrypt(data));
 		this.request(options, callback);
 	},
 	request : function(options, callback) {
