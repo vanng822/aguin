@@ -47,15 +47,12 @@ Aguin.prototype = {
 	post: function(entity, data, callback) {
 		var options = url.parse(this.url);
 		options.method = 'POST';
-		options.headers = {'X-AGUIN-API-KEY': this.apiKey};
 		options.path = '/?message=' + encodeURIComponent(this.encrypt({entity:entity, data: data}));
 		this.request(options, callback);
 	},
 	get: function(entity, criteria, callback) {
 		var options = url.parse(this.url);
 		var data;
-		options.method = 'GET';
-		options.headers = {'X-AGUIN-API-KEY': this.apiKey};
 		if (!callback) {
 			callback = criteria;
 			criteria = null;
@@ -69,6 +66,11 @@ Aguin.prototype = {
 		options.path = '/?message=' + encodeURIComponent(this.encrypt(data));
 		this.request(options, callback);
 	},
+	status : function(callback) {
+		var options = url.parse(this.url);
+		options.path = '/status';
+		this.request(options, callback);
+	},
 	request : function(options, callback) {
 		var h, self = this;
 		if (options.protocol === 'https:') {
@@ -76,7 +78,11 @@ Aguin.prototype = {
 		} else {
 			h = http;
 		}
-		console.log(options);
+		if (options.headers) {
+			options.headers['X-AGUIN-API-KEY'] = this.apiKey;
+		} else {
+			options.headers = {'X-AGUIN-API-KEY': this.apiKey};
+		}
 		var req = h.request(options, function(res) {
 			var data = '';
 			res.on('data', function(chunk) {

@@ -7,6 +7,9 @@ t.post("something", {"test": 1, "t": 0.1}, function(err, result) {
 	console.log(err, result);
 });
 */
+t.status(function(err, result) {
+	console.log(err, result);
+});
 t.get('something', function(err, result) {
 	console.log(err, result);
 });
