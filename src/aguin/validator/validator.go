@@ -1,9 +1,7 @@
 package validator
 
 import (
-	"log"
 	"regexp"
-	"time"
 )
 
 var allowedChars = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
@@ -80,22 +78,16 @@ func ValidateEntity(message map[string]interface{}) EntitySchema {
 			if len(newArr) > 0 {
 				newData[k] = newArr
 			}
-		case string:
-			vvv, err := time.Parse("2006-01-02 03:04:01", vv)
-			if err != nil {
-				log.Println(err)
-				errCounter += 1
-			} else {
-				newData[k] = vvv
-			}
 		default:
 			errCounter += 1
 		}
 	}
 	if errCounter > 0 {
 		result.Validated = false
+		result.Data = map[string]interface{}{}
 	} else {
 		result.Validated = len(newData) > 0
+		result.Data = newData
 	}
 	return result
 }
