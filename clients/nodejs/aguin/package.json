@@ -1,0 +1,25 @@
+{
+	"name": "aguin",
+	"description": "Simple client for aguin",
+	"keywords": ["aguin", "api"],
+	"author": "Nguyen Van Nhu",
+	"homepage" : "https://github.com/vanng822/aguin",
+	"devDependencies": {"mocha": "*"},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/vanng822/aguin.git"
+	},
+	"bugs": {
+		"url": "https://github.com/vanng822/aguin/issues"
+	},
+	"scripts": {
+		"test": "./node_modules/mocha/bin/mocha"
+	},
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://github.com/vanng822/aguin/blob/master/LICENSE"
+		}
+	],
+	"version": "0.0.1"
+}
