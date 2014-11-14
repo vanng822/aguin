@@ -58,7 +58,12 @@ func VerifyRequest() interface{} {
 			serveForbidden(render)
 			return
 		}
-
+		
+		if req.RequestURI == "/status" {
+			IndexStatus(render)
+			return
+		}
+			
 		requestData.app = app
 		setting.conf = config.AppConf()
 		// parse form for data
@@ -138,6 +143,7 @@ func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render,
 	serveBadRequestData(render)
 }
 
+// Should not do anything but return OK
 func IndexStatus(render render.Render) {
 	serveOK(render)
 }

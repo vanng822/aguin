@@ -33,7 +33,6 @@ func main() {
 	api.Use(aguin_api.VerifyRequest())
 	api.Get("/", aguin_api.IndexGet)
 	api.Post("/", aguin_api.IndexPost)
-	api.Get("/status", aguin_api.IndexStatus)
 	api.Options("/", func(res http.ResponseWriter, req *http.Request) {
 		res.Header().Add("Allow", "POST, GET")
 	})
