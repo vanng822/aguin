@@ -63,12 +63,18 @@ func VerifyRequest() interface{} {
 		setting.conf = config.AppConf()
 		// parse form for data
 		req.ParseForm()
+		message := req.Form.Get("message")
+		if message == "" {
+			setting.log.Info("Request made without message")
+			serveBadRequestJson(render)
+			return
+		}
 		if setting.conf.EncryptionEnabled {
 			// decrypting data here
-			authKey := []byte(app.Secret)
-			decryptedMessage, err := crypto.Decrypt(req.Form.Get("message"), authKey, authKey)
-			if err != nil {
-				setting.log.Error("error: %v, message: %v", err, req.Form.Get("message"))
+			authKey := []byte(app.Secret)	
+			decryptedMessage, err := crypto.Decrypt(message, authKey, authKey)
+			if err != nil || decryptedMessage == nil {
+				setting.log.Error("error: %v, message: %v, decryptedMessage: %v", err, message, decryptedMessage)
 				serveInternalServerError(render)
 				return
 			}
@@ -79,7 +85,7 @@ func VerifyRequest() interface{} {
 				serveForbidden(render)
 				return
 			}
-			data3, err := utils.Bytes2json([]byte(req.Form.Get("message")))
+			data3, err := utils.Bytes2json([]byte(message))
 			if err != nil {
 				setting.log.Error("%v", err)
 				serveBadRequestJson(render)
