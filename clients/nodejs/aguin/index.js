@@ -24,7 +24,7 @@ Aguin.prototype = {
 		expectedMac = hmac.update(encoded).digest();
 		return this.urlencode(expectedMac.toString('base64')) + '.' + this.urlencode(encoded.toString('base64'));
 	},
-	decrypt : function(encryptedData, callback) {
+	decrypt : function(encryptedData) {
 		var parts, expectedMac, message, messageMAC;
 		var hmac, decipher;
 		parts = String(encryptedData).split('.');
