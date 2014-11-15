@@ -4,6 +4,7 @@ var http = require('http');
 var https = require('https');
 var url = require('url');
 
+VERSION='aguin_nodejs/0.1'
 
 var Aguin = function(apiKey, apiSecret, aesSecret, url) {
 	this.apiKey = apiKey;
@@ -78,11 +79,12 @@ Aguin.prototype = {
 		} else {
 			h = http;
 		}
-		if (options.headers) {
-			options.headers['X-AGUIN-API-KEY'] = this.apiKey;
-		} else {
-			options.headers = {'X-AGUIN-API-KEY': this.apiKey};
+		if (!options.headers) {
+			options.headers = {};
 		}
+		options.headers['X-AGUIN-API-KEY'] = this.apiKey;
+		options.headers['User-Agent'] = VERSION;
+		
 		var req = h.request(options, function(res) {
 			var data = '';
 			res.on('data', function(chunk) {
