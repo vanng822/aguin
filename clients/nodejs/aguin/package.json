@@ -1,7 +1,7 @@
 {
 	"name": "aguin",
 	"description": "Simple client for aguin",
-	"keywords": ["aguin", "api"],
+	"keywords": ["aguin", "api", "client"],
 	"author": "Nguyen Van Nhu",
 	"homepage" : "https://github.com/vanng822/aguin",
 	"devDependencies": {"mocha": "*"},
