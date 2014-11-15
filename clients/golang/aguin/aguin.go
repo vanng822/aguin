@@ -27,6 +27,7 @@ type Aguin struct {
 }
 
 func New(apiKey, authKey, aesKey, url string) *Aguin {
+	url := strings.TrimRight(url, "/")
 	return &Aguin{apiKey, []byte(authKey), []byte(aesKey), url}
 }
 
@@ -53,10 +54,6 @@ func (a *Aguin) Decrypt(data string) (interface{}, error) {
 	return nil, fmt.Errorf("Invalid signed request")
 }
 
-/*
-* Data from server to client shouldn't be a problem with + and /
-* but we encode it anyways so we can use this logic for both server and client side
- */
 func (a *Aguin) Encrypt(data interface{}) (string, error) {
 	message, err := json2bytes(data)
 	if err != nil {
@@ -126,7 +123,7 @@ func (a *Aguin) Get(entity string, criteria map[string]interface{}) (map[string]
 	cryptedMessage, err := a.Encrypt(criteria)
 
 	message.Add("message", cryptedMessage)
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s?%s", a.url, message.Encode()), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/?%s", a.url, message.Encode()), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +133,7 @@ func (a *Aguin) Get(entity string, criteria map[string]interface{}) (map[string]
 
 func (a *Aguin) Status() (map[string]interface{}, error) {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", fmt.Sprintf("%sstatus", a.url), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/status", a.url), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -225,11 +222,3 @@ func json2bytes(data interface{}) ([]byte, error) {
 
 	return b, nil
 }
-
-/*
-func main() {
-	t := New("545e0716f2fea0c7a9c46c74", "545e0716f2fea0c7a9c46c74fec46c71", "545e0716f2fea0c7a9c46c74fec46c71", "http://127.0.0.1:8080/")
-	fmt.Println(t.Status())
-	fmt.Println(t.Get("something", nil))
-}
-*/
