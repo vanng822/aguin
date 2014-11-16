@@ -2,10 +2,13 @@ package validator
 
 import (
 	"regexp"
+	"time"
+	"aguin/utils"
 )
 
 var allowedChars = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
 var validAPIKey = regexp.MustCompile(`^[a-f0-9]{24}$`)
+const dateInputFormat = "2006-01-02"
 
 func ValidAPIKey(id string) bool {
 	return validAPIKey.MatchString(id)
@@ -21,19 +24,61 @@ func ValidateEntityName(name string) string {
 type SearchSchema struct {
 	Validated bool
 	Entity    string
+	StartDate time.Time
+	EndDate   time.Time
 }
 
+
 func ValidateSearch(message map[string]interface{}) SearchSchema {
+	log := utils.GetLogger("aguin")
 	entity, _ := message["entity"].(string)
 	entity = ValidateEntityName(entity)
-
-	return SearchSchema{entity != "", entity}
+	validated := entity != ""
+	schema := SearchSchema{}
+	schema.Validated = validated
+	schema.Entity = entity
+	// if dates invalid set to latest 30 days
+	var start, end time.Time
+	var err error
+	
+	startDate, ok := message["startDate"].(string)
+	log.Debug("startDate:%v,%v", startDate, ok)
+	
+	if ok {
+		start, err = time.Parse(dateInputFormat, startDate)
+		log.Debug("start:%v,%v", start, err)
+	}
+	endDate, ok := message["endDate"].(string)
+	log.Debug("endDate:%v,%v", endDate, ok)
+	if ok {
+		end, err = time.Parse(dateInputFormat, endDate)
+		log.Debug("end:%v,%v", end, err)
+	}
+	
+	if !start.IsZero() && !end.IsZero() {
+		if start.After(end) {
+			end = time.Now()
+			start = end.AddDate(0, 0, -30)
+		} else if end.AddDate(0, 0, -90).After(start) {
+			start = end.AddDate(0, 0, -90)
+		}
+		
+	} else {
+		end = time.Now()
+		start = schema.EndDate.AddDate(0, 0, -30)
+	}
+	
+	// set start date time at 00:00:00 and end date to 23:59:59
+	schema.StartDate = time.Date(start.Year(), start.Month(), start.Day(), 0, 0, 0, 0, start.Location())
+	schema.EndDate = time.Date(end.Year(), end.Month(), end.Day(), 23, 59, 59, 0, end.Location())
+	
+	return schema
 }
 
 type EntitySchema struct {
 	Validated bool
-	Entity string
-	Data map[string]interface{}
+	Entity    string
+	Data      map[string]interface{}
 }
 
 func ValidateEntity(message map[string]interface{}) EntitySchema {

@@ -58,12 +58,12 @@ func VerifyRequest() interface{} {
 			serveForbidden(render)
 			return
 		}
-		
+
 		if req.RequestURI == "/status" {
 			IndexStatus(render)
 			return
 		}
-			
+
 		requestData.app = app
 		setting.conf = config.AppConf()
 		// parse form for data
@@ -76,7 +76,7 @@ func VerifyRequest() interface{} {
 		}
 		if setting.conf.EncryptionEnabled {
 			// decrypting data here
-			authKey := []byte(app.Secret)	
+			authKey := []byte(app.Secret)
 			decryptedMessage, err := crypto.Decrypt(message, authKey, authKey)
 			if err != nil || decryptedMessage == nil {
 				setting.log.Error("error: %v, message: %v, decryptedMessage: %v", err, message, decryptedMessage)
@@ -111,8 +111,14 @@ func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, 
 		serveBadRequestData(render)
 		return
 	}
+	setting.log.Debug("%v", requestData.message)
+	setting.log.Debug("%v", criteria)
 	var results []model.Entity
-	err := model.EntityCollection(setting.dbSession).Find(bson.M{"name": criteria.Entity, "appid": requestData.app.Id}).All(&results)
+	err := model.EntityCollection(setting.dbSession).Find(
+		bson.M{"name": criteria.Entity,
+			"appid":      requestData.app.Id,
+			"created_at": bson.M{"$gte": criteria.StartDate, "$lte": criteria.EndDate}}).All(&results)
+			
 	if err != nil {
 		setting.log.Error("%v", err)
 		serveInternalServerError(render)
