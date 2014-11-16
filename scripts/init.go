@@ -1,9 +1,9 @@
 package main
 
 import (
-	"aguin/model"
 	"aguin/config"
 	"aguin/crypto"
+	"aguin/model"
 	"flag"
 	"fmt"
 )
@@ -11,26 +11,28 @@ import (
 func main() {
 	var (
 		configPath string
-		email string
-		name string
-		app string
+		email      string
+		name       string
+		app        string
 	)
 	flag.StringVar(&email, "e", "", "Your email")
 	flag.StringVar(&name, "n", "", "Your name")
 	flag.StringVar(&app, "a", "", "Your application name")
 	flag.StringVar(&configPath, "c", "", "Path to configurations")
-	
+
 	flag.Parse()
-	if configPath != "" {
-		config.SetConfigPath(configPath)
-	}
 	if email == "" || name == "" || app == "" {
 		fmt.Println("You need to specify your email, your name and your application name")
 		flag.Usage()
 		return
 	}
+	if configPath != "" {
+		config.SetConfigPath(configPath)
+	}
 	config.ReadConfig()
+
 	session := model.Session()
+	model.EnsureIndex(false)
 	u := model.User{}
 	u.Email = email
 	u.Name = name

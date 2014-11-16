@@ -3,6 +3,7 @@ package main
 import (
 	aguin_api "aguin/api"
 	"aguin/config"
+	"aguin/model"
 	"flag"
 	"fmt"
 	"github.com/go-martini/martini"
@@ -27,7 +28,7 @@ func main() {
 		config.SetConfigPath(configPath)
 	}
 	config.ReadConfig()
-	
+	model.EnsureIndex(true)
 	api := martini.Classic()
 	api.Use(render.Renderer())
 	api.Use(aguin_api.VerifyRequest())
