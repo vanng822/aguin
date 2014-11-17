@@ -1,3 +1,4 @@
+export GOPATH := $(shell pwd)
 
 all:
 	make godeps
@@ -25,3 +26,7 @@ goinstall:
 gotest:
 	go test aguin/crypto
 	go test aguin/validator
+
+	
+gorun:
+	go run aguin.go
