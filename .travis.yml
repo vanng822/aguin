@@ -8,6 +8,10 @@ install:
   - go get github.com/go-martini/martini
   - go get github.com/martini-contrib/render
   - go get gopkg.in/mgo.v2
-  - go get -v aguin/validator/
+  - go get github.com/stretchr/testify/assert
+  - go install github.com/vanng822/aguin/utils
+  - go install github.com/vanng822/aguin/validator
+  - go install github.com/vanng822/aguin/config
+  - go install github.com/vanng822/aguin/validator
 
 script: make
