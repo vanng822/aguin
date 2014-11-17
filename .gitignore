@@ -1,3 +1,4 @@
 .project
 *.pyc
 clients/python/aguin.egg-info
+pkg
