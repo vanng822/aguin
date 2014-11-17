@@ -5,7 +5,7 @@ import(
 	"crypto/rand"
 	"io"
 )
-func AESDecrypt(message []byte, key []byte) []byte {
+func AESDecrypt(message, key []byte) []byte {
 	if len(message) < aes.BlockSize {
 		panic("Message too short")
 	}
