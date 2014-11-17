@@ -55,7 +55,13 @@ func VerifyRequest() interface{} {
 		defer setting.dbSession.Close()
 		err := model.AppCollection(setting.dbSession).FindId(bson.ObjectIdHex(apiKey)).One(&app)
 		if err != nil {
-			serveForbidden(render)
+			if err.Error() == "not found" {
+				log.Info("Try to find application for key %s which is not found, error: %v", apiKey, err)
+				serveForbidden(render)
+			} else {
+				log.Error("Error when finding application for key %s, error: %v", apiKey, err)
+				serveInternalServerError(render)
+			}
 			return
 		}
 
@@ -118,7 +124,7 @@ func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, 
 		bson.M{"name": criteria.Entity,
 			"appid":      requestData.app.Id,
 			"created_at": bson.M{"$gte": criteria.StartDate, "$lte": criteria.EndDate}}).All(&results)
-			
+
 	if err != nil {
 		setting.log.Error("%v", err)
 		serveInternalServerError(render)
