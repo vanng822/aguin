@@ -5,9 +5,9 @@ go:
   - tip
 
 install:
-	- go get github.com/go-martini/martini
-	- go get github.com/martini-contrib/render
-	- go get gopkg.in/mgo.v2
-	- go get -v aguin/validator/
+  - go get github.com/go-martini/martini
+  - go get github.com/martini-contrib/render
+  - go get gopkg.in/mgo.v2
+  - go get -v aguin/validator/
 
 script: make
