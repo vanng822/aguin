@@ -21,25 +21,25 @@ type Logger struct {
 }
 
 func (l *Logger) Critical(format string, args ...interface{}) {
-	l.logger.Print(fmt.Sprintf(format, args))
+	l.logger.Printf(format, args...)
 }
 
 func (l *Logger) Error(format string, args ...interface{}) {
-	l.logger.Print(fmt.Sprintf(format, args))
+	l.logger.Printf(format, args...)
 }
 
 func (l *Logger) Warning(format string, args ...interface{}) {
-	l.logger.Printf(format, args)
+	l.logger.Printf(format, args...)
 }
 
 func (l *Logger) Notice(format string, args ...interface{}) {
-	l.logger.Printf(format, args)
+	l.logger.Printf(format, args...)
 }
 
 func (l *Logger) Info(format string, args ...interface{}) {
-	l.logger.Printf(format, args)
+	l.logger.Printf(format, args...)
 }
 
 func (l *Logger) Debug(format string, args ...interface{}) {
-	l.logger.Printf(format, args)
+	l.logger.Printf(format, args...)
 }
