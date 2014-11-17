@@ -2,3 +2,5 @@
 *.pyc
 clients/python/aguin.egg-info
 pkg
+src/github.com
+src/gopkg.in
