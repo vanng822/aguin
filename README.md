@@ -21,3 +21,7 @@ where "make" include
 	make goinstall
 	make gotestdeps
 	make gotest
+
+If you want to run "go command" then just export GOPATH to current working directory, such as
+
+	export GOPATH=$(pwd) && go run aguin.go
