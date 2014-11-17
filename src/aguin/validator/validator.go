@@ -65,7 +65,7 @@ func ValidateSearch(message map[string]interface{}) SearchSchema {
 		
 	} else {
 		end = time.Now()
-		start = schema.EndDate.AddDate(0, 0, -30)
+		start = end.AddDate(0, 0, -30)
 	}
 	
 	// set start date time at 00:00:00 and end date to 23:59:59
