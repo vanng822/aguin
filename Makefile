@@ -30,3 +30,7 @@ gotest:
 	
 gorun:
 	go run aguin.go
+	
+	
+gobuild:
+	go build aguin.go
