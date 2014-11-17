@@ -10,10 +10,14 @@ You need to have mongodb installed, http://www.mongodb.org/, for storing the dat
 
 You need Go to run/compile this program http://golang.org/
 
-You need to install packages
+You can get started by running
+	
+	make
+	make gorun
+	
+where "make" include
 
-	go get github.com/go-martini/martini
-	
-	go get github.com/martini-contrib/render
-	
-	go get gopkg.in/mgo.v2
+	make godeps
+	make goinstall
+	make gotestdeps
+	make gotest
