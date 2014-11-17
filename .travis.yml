@@ -2,15 +2,6 @@ language: go
 
 go:
   - 1.3
-  - tip
-env:
-  $HOME/gopath/src/github.com/vanng822/aguin
-install:
-  - export GOPATH=$HOME/gopath/src/github.com/vanng822/aguin:$GOPATH
-  - go get github.com/go-martini/martini
-  - go get github.com/martini-contrib/render
-  - go get gopkg.in/mgo.v2
-  - go get github.com/stretchr/testify/assert
 
 script:
   - export GOPATH=$HOME/gopath/src/github.com/vanng822/aguin:$GOPATH
