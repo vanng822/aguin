@@ -37,22 +37,30 @@ func ValidateSearch(message map[string]interface{}) SearchSchema {
 	schema := SearchSchema{}
 	schema.Validated = validated
 	schema.Entity = entity
+	
+	if !schema.Validated {
+		// no point to continue
+		log.Info("Request with invalid entity")
+		return schema
+	}
 	// if dates invalid set to latest 30 days
 	var start, end time.Time
 	var err error
 	
 	startDate, ok := message["startDate"].(string)
-	log.Debug("startDate:%v,%v", startDate, ok)
 	
 	if ok {
 		start, err = time.Parse(dateInputFormat, startDate)
-		log.Debug("start:%v,%v", start, err)
+		if err != nil {
+			log.Info("Error parsing start date %s", startDate)
+		}
 	}
 	endDate, ok := message["endDate"].(string)
-	log.Debug("endDate:%v,%v", endDate, ok)
 	if ok {
 		end, err = time.Parse(dateInputFormat, endDate)
-		log.Debug("end:%v,%v", end, err)
+		if err != nil {
+			log.Info("Error parsing end date %s", endDate)
+		}
 	}
 	
 	if !start.IsZero() && !end.IsZero() {
