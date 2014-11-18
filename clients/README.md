@@ -36,7 +36,8 @@ Entity:
 
 
 Test data:
+1. auth & aes key: 545e0716f2fea0c7a9c46c74fec46c71
 
-1. input: WmtlMxl4d_VTfUYnl-A0Uycpr2e3VswKDwoPd03XtoY=.JZMk6FZloYh5BL0K7dHGSyTqB4lTgd9annrFEgLTELnxR3bHweL2
+2. input: WmtlMxl4d_VTfUYnl-A0Uycpr2e3VswKDwoPd03XtoY=.JZMk6FZloYh5BL0K7dHGSyTqB4lTgd9annrFEgLTELnxR3bHweL2
 
-2. decrypted: {"entity":"something2"}
+3. decrypted: {"entity":"something2"}
