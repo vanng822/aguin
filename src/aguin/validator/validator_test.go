@@ -38,10 +38,19 @@ func TestValidateFalse(t *testing.T) {
 	assert.Equal(t, "testing", r.Entity)
 }
 
+func TestValidateSearchInvalid(t *testing.T) {
+	r := ValidateSearch(map[string]interface{}{"entity": ""})
+	assert.Equal(t, r.Entity, "")
+	assert.Equal(t, r.Validated, false)
+	assert.Equal(t, r.EndDate.IsZero(), true)
+	assert.Equal(t, r.StartDate.IsZero(), true)
+}
+
 func TestValidateSearchDefaultDates(t *testing.T) {
 	now := time.Now()
 	r := ValidateSearch(map[string]interface{}{"entity": "testing"})
 	assert.Equal(t, r.Entity, "testing")
+	assert.Equal(t, r.Validated, true)
 	assert.Equal(t, r.EndDate.Year(), now.Year())
 	assert.Equal(t, r.EndDate.YearDay(), now.YearDay())
 	assert.Equal(t, r.EndDate.Hour(), 23)
