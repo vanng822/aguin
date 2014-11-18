@@ -1,7 +1,7 @@
 aguin (adélie penguin)
 =====
 
-For collecting daily/weekly stats of different kind. They should be simple data structure of integer, float or boolean. Array of integer/float can be accepted.
+For collecting daily/weekly stats or data of different kind. They should be simple data structure of integer, float or boolean. Array of integer/float can be accepted.
 
 The data can be sent signed/encrypted using HMAC/AES or just not if your channel is already secure.
 
@@ -21,6 +21,10 @@ where "make" include
 	make goinstall
 	make gotestdeps
 	make gotest
+
+You can build running
+	
+	make gobuild
 
 If you want to run "go command" then just export GOPATH to current working directory, such as
 
