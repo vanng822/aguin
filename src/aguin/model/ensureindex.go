@@ -5,9 +5,9 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
-func EnsureIndex(threaded bool) {
+func EnsureIndex(concurrent bool) {
 	log := utils.GetLogger("system")
-	if threaded {
+	if concurrent {
 		log.Info("EnsureIndex running in background")
 		go ensureUserIndex()
 		go ensureAppIndex()
