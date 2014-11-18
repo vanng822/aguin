@@ -3,6 +3,7 @@ package validator
 import (
 	"testing"
 	"github.com/stretchr/testify/assert"
+	"time"
 )
 
 func TestValidateTrue(t *testing.T) {
@@ -36,3 +37,22 @@ func TestValidateFalse(t *testing.T) {
 	assert.Equal(t, map[string]interface{}{}, r.Data)
 	assert.Equal(t, "testing", r.Entity)
 }
+
+func TestValidateSearchDefaultDates(t *testing.T) {
+	now := time.Now()
+	r := ValidateSearch(map[string]interface{}{"entity": "testing"})
+	assert.Equal(t, r.Entity, "testing")
+	assert.Equal(t, r.EndDate.Year(), now.Year())
+	assert.Equal(t, r.EndDate.YearDay(), now.YearDay())
+	assert.Equal(t, r.EndDate.Hour(), 23)
+	assert.Equal(t, r.EndDate.Minute(), 59)
+	assert.Equal(t, r.EndDate.Second(), 59)
+	
+	end := now.AddDate(0, 0, -30)
+	assert.Equal(t, r.StartDate.Year(), end.Year())
+	assert.Equal(t, r.StartDate.YearDay(), end.YearDay())
+	assert.Equal(t, r.StartDate.Hour(), 0)
+	assert.Equal(t, r.StartDate.Minute(), 0)
+	assert.Equal(t, r.StartDate.Second(), 0)
+}
+
