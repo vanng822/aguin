@@ -37,5 +37,6 @@ Entity:
 
 Test data:
 
-input: WmtlMxl4d_VTfUYnl-A0Uycpr2e3VswKDwoPd03XtoY=.JZMk6FZloYh5BL0K7dHGSyTqB4lTgd9annrFEgLTELnxR3bHweL2
-decrypted: {"entity":"something2"}
+1. input: WmtlMxl4d_VTfUYnl-A0Uycpr2e3VswKDwoPd03XtoY=.JZMk6FZloYh5BL0K7dHGSyTqB4lTgd9annrFEgLTELnxR3bHweL2
+
+2. decrypted: {"entity":"something2"}
