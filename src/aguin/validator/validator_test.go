@@ -56,3 +56,38 @@ func TestValidateSearchDefaultDates(t *testing.T) {
 	assert.Equal(t, r.StartDate.Second(), 0)
 }
 
+func TestValidateSearchValidDateRange(t *testing.T) {
+	r := ValidateSearch(map[string]interface{}{"entity": "testing", "startDate": "2014-10-11", "endDate": "2014-11-10"})
+	assert.Equal(t, r.Entity, "testing")
+	assert.Equal(t, r.EndDate.Year(), 2014)
+	assert.Equal(t, r.EndDate.Month(), time.November)
+	assert.Equal(t, r.EndDate.Day(), 10)
+	assert.Equal(t, r.EndDate.Hour(), 23)
+	assert.Equal(t, r.EndDate.Minute(), 59)
+	assert.Equal(t, r.EndDate.Second(), 59)
+	
+	assert.Equal(t, r.StartDate.Year(), 2014)
+	assert.Equal(t, r.StartDate.Month(), time.October)
+	assert.Equal(t, r.StartDate.Day(), 11)
+	assert.Equal(t, r.StartDate.Hour(), 0)
+	assert.Equal(t, r.StartDate.Minute(), 0)
+	assert.Equal(t, r.StartDate.Second(), 0)
+}
+
+func TestValidateSearchLongDateRange(t *testing.T) {
+	r := ValidateSearch(map[string]interface{}{"entity": "testing", "startDate": "2011-10-11", "endDate": "2014-11-10"})
+	assert.Equal(t, r.Entity, "testing")
+	assert.Equal(t, r.EndDate.Year(), 2014)
+	assert.Equal(t, r.EndDate.Month(), time.November)
+	assert.Equal(t, r.EndDate.Day(), 10)
+	assert.Equal(t, r.EndDate.Hour(), 23)
+	assert.Equal(t, r.EndDate.Minute(), 59)
+	assert.Equal(t, r.EndDate.Second(), 59)
+	// end date minus 30 days
+	assert.Equal(t, r.StartDate.Year(), 2014)
+	assert.Equal(t, r.StartDate.Month(), time.August)
+	assert.Equal(t, r.StartDate.Day(), 12)
+	assert.Equal(t, r.StartDate.Hour(), 0)
+	assert.Equal(t, r.StartDate.Minute(), 0)
+	assert.Equal(t, r.StartDate.Second(), 0)
+}
