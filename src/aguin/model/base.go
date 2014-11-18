@@ -9,6 +9,9 @@ var session *mgo.Session
 
 func Dial() *mgo.Session {
 	conf := config.AppConf()
+	if conf.Mongodb == "" {
+		panic("Mongodb connection info not found in the config")
+	}
 	session, err := mgo.Dial(conf.Mongodb)
 	if err != nil {
 		panic(err)
