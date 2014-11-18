@@ -33,3 +33,9 @@ Entity:
 
 1. entity: string
 2. data: json data with primitive type. Integer, float, boolean and array of integer or float.
+
+
+Test data:
+
+input: WmtlMxl4d_VTfUYnl-A0Uycpr2e3VswKDwoPd03XtoY=.JZMk6FZloYh5BL0K7dHGSyTqB4lTgd9annrFEgLTELnxR3bHweL2
+decrypted: {"entity":"something2"}
