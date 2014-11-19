@@ -27,3 +27,14 @@ func TestBytes2json(t *testing.T) {
 	assert.Empty(t, err)
 	assert.Equal(t, d2["t"].(string), "s")	
 }
+
+func TestJson2bytes(t *testing.T) {
+	data := map[string]interface{}{"t":"s","two":2,"obj":map[string]interface{}{"c":"b","j":"F"},"a":[]interface{}{1,2,3}}
+	
+	d, err := Json2bytes(data)
+	
+	assert.Empty(t, err)
+	rdata, _ := Bytes2json(d)
+	d2 := rdata.(map[string]interface{})
+	assert.Equal(t, d2["t"].(string), data["t"].(string))
+}
