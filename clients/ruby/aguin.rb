@@ -2,18 +2,17 @@ require "openssl"
 require "digest"
 require "base64"
 require 'json'
-require 'net/http'
+require 'net/https'
 
 VERSION = "Aguin_ruby/0.1"
 
 class Aguin
   @@AES_BLOCK_SIZE = 16
-  
   def initialize(api_key, api_secret, aes_key, url)
     @api_key = api_key
     @api_secret = api_secret
     @aes_key = aes_key
-    @url = url.chomp('/')  
+    @url = url.chomp('/')
   end
 
   def get(entity, criteria = nil)
@@ -21,37 +20,38 @@ class Aguin
       criteria = {}
     end
     criteria["entity"] = entity
-    uri = URI(@url)
+    uri = URI.parse(@url)
     uri.query = URI.encode_www_form({:message => encrypt(criteria)})
     req = Net::HTTP::Get.new(uri)
     return request(req, uri)
   end
 
   def post(entity, data)
-    uri = URI(@url)
+    uri = URI.parse(@url)
     req = Net::HTTP::Post.new(uri)
     req.set_form_data('message' => encrypt({:entity => entity, :data => data}))
     return request(req, uri)
   end
 
   def status()
-    uri = URI(@url + '/status')
+    uri = URI.parse(@url + '/status')
     req = Net::HTTP::Get.new(uri)
     return request(req, uri)
   end
 
   private
-  
+
   def request(req, uri)
     req.initialize_http_header({"User-Agent" => VERSION, "X-AGUIN-API-KEY" => @api_key})
-
-    res = Net::HTTP.start(uri.hostname, uri.port) do |http|
-      http.request(req)
+    http = Net::HTTP.new(uri.host, uri.port)
+    if uri.instance_of? URI::HTTPS
+    http.use_ssl = true
     end
+    res = http.request(req)
     bjson = JSON.parse(res.body)
-    
+
     if bjson["encrypted"]
-      bjson["result"] = decrypt(bjson["result"])
+    bjson["result"] = decrypt(bjson["result"])
     end
     return bjson
   end
@@ -100,4 +100,3 @@ t = Aguin::new('545e0716f2fea0c7a9c46c74', '545e0716f2fea0c7a9c46c74fec46c71', '
 puts t.status()
 #puts t.post('something', {:a => 1, :b => 2, :c => 0.1})
 puts t.get('something')
-
