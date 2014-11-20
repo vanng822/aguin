@@ -123,13 +123,14 @@ func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, 
 	err := model.EntityCollection(setting.dbSession).Find(
 		bson.M{"name": criteria.Entity,
 			"appid":      requestData.app.Id,
-			"created_at": bson.M{"$gte": criteria.StartDate, "$lte": criteria.EndDate}}).All(&results)
+			"createdat": bson.M{"$gte": criteria.StartDate, "$lte": criteria.EndDate}}).All(&results)
 
 	if err != nil {
 		setting.log.Error("%v", err)
 		serveInternalServerError(render)
 		return
 	}
+	
 	ServeResponse(http.StatusOK, render, results, requestData, setting)
 }
 
