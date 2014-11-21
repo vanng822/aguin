@@ -41,7 +41,7 @@ func main() {
 	ucollection.Find(map[string]interface{}{"email": email}).One(&u)
 	fmt.Printf("email: %s, name: %s\n", u.Email, u.Name)
 	a := model.Application{}
-	a.Userid = u.Id
+	a.UserId = u.Id
 	a.Name = app
 	a.Secret = crypto.RandomHex(16)
 	a.Save(session)

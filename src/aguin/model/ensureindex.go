@@ -48,16 +48,16 @@ func ensureIndexes(indexes []mgo.Index, c *mgo.Collection) {
 func ensureEntityIndex() {
 	session := Session()
 	defer session.Close()
-
+	entity_tags := utils.GetFieldsTag(Entity{}, "bson")
 	indexes := []mgo.Index{
 		mgo.Index{
-			Key:        []string{"name"},
+			Key:        []string{entity_tags.Get("Name")},
 			Background: true},
 		mgo.Index{
-			Key:        []string{"appid"},
+			Key:        []string{entity_tags.Get("AppId")},
 			Background: true},
 		mgo.Index{
-			Key:        []string{"created_at"},
+			Key:        []string{entity_tags.Get("CreatedAt")},
 			Background: true}}
 
 	ensureIndexes(indexes, EntityCollection(session))
@@ -66,9 +66,10 @@ func ensureEntityIndex() {
 func ensureAppIndex() {
 	session := Session()
 	defer session.Close()
+	app_tags := utils.GetFieldsTag(Application{}, "bson")
 	indexes := []mgo.Index{
 		mgo.Index{
-			Key:        []string{"name", "userid"},
+			Key:        []string{app_tags.Get("Name"), app_tags.Get("UserId")},
 			Unique:     true,
 			Sparse:     true,
 			Background: true}}
@@ -78,10 +79,10 @@ func ensureAppIndex() {
 func ensureUserIndex() {
 	session := Session()
 	defer session.Close()
-
+	user_tags := utils.GetFieldsTag(User{}, "bson")
 	indexes := []mgo.Index{
 		mgo.Index{
-			Key:        []string{"email"},
+			Key:        []string{user_tags.Get("Email")},
 			Unique:     true,
 			Sparse:     true,
 			Background: true}}

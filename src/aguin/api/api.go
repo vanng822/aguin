@@ -25,6 +25,14 @@ type AguinSetting struct {
 	conf      *config.AppConfig
 }
 
+var (
+	entity_tags utils.Tags
+)
+
+func init() {
+	entity_tags = utils.GetFieldsTag(model.Entity{}, "bson")
+}
+
 func VerifyRequest() interface{} {
 	return func(c martini.Context, res http.ResponseWriter, req *http.Request, render render.Render) {
 		log := utils.GetLogger("aguin")
@@ -120,17 +128,18 @@ func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, 
 	setting.log.Debug("%v", requestData.message)
 	setting.log.Debug("%v", criteria)
 	var results []model.Entity
+	
 	err := model.EntityCollection(setting.dbSession).Find(
-		bson.M{"name": criteria.Entity,
-			"appid":      requestData.app.Id,
-			"createdat": bson.M{"$gte": criteria.StartDate, "$lte": criteria.EndDate}}).All(&results)
+		bson.M{entity_tags.Get("Name"): criteria.Entity,
+			entity_tags.Get("AppId"): requestData.app.Id,
+			entity_tags.Get("CreatedAt"): bson.M{"$gte": criteria.StartDate, "$lte": criteria.EndDate}}).All(&results)
 
 	if err != nil {
 		setting.log.Error("%v", err)
 		serveInternalServerError(render)
 		return
 	}
-	
+
 	ServeResponse(http.StatusOK, render, results, requestData, setting)
 }
 

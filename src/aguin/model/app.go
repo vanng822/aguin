@@ -7,10 +7,10 @@ import (
 
 type Application struct {
 	Id          bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Userid      bson.ObjectId
-	Name        string
-	Secret      string `json:"-"`
-	Description string
+	UserId      bson.ObjectId `json:"userid" bson:"userid"`
+	Name        string        `json:"name" bson:"name"`
+	Secret      string        `json:"-" bson:"secret"`
+	Description string        `json:"description" bson:"description"`
 }
 
 func (m *Application) Save(session *mgo.Session) error {
