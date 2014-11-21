@@ -19,7 +19,10 @@ func GetFieldsTag(o interface{}, tagname string) Tags {
 	tags := make(map[string]string, st.NumField())	
 	for i := 0; i < st.NumField(); i++ {
 		field := st.Field(i)
-		tags[field.Name] = field.Tag.Get(tagname)
+		value := field.Tag.Get(tagname)
+		if value != "" {
+			tags[field.Name] = value
+		}
 	}
 	return tags
 }
