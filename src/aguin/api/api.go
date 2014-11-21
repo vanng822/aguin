@@ -26,11 +26,11 @@ type AguinSetting struct {
 }
 
 var (
-	entity_tags utils.Tags
+	entity_bson_tags utils.Tags
 )
 
 func init() {
-	entity_tags = utils.GetFieldsTag(model.Entity{}, "bson")
+	entity_bson_tags = utils.GetFieldsTag(model.Entity{}, "bson")
 }
 
 func VerifyRequest() interface{} {
@@ -128,11 +128,11 @@ func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, 
 	setting.log.Debug("%v", requestData.message)
 	setting.log.Debug("%v", criteria)
 	var results []model.Entity
-	
+
 	err := model.EntityCollection(setting.dbSession).Find(
-		bson.M{entity_tags.Get("Name"): criteria.Entity,
-			entity_tags.Get("AppId"): requestData.app.Id,
-			entity_tags.Get("CreatedAt"): bson.M{"$gte": criteria.StartDate, "$lte": criteria.EndDate}}).All(&results)
+		bson.M{entity_bson_tags.Get("Name"): criteria.Entity,
+			entity_bson_tags.Get("AppId"):     requestData.app.Id,
+			entity_bson_tags.Get("CreatedAt"): bson.M{"$gte": criteria.StartDate, "$lte": criteria.EndDate}}).All(&results)
 
 	if err != nil {
 		setting.log.Error("%v", err)
