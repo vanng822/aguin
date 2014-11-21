@@ -30,8 +30,10 @@ gotest:
 	
 	
 gorun:
+	make goinstall
 	go run aguin.go
 	
 	
 gobuild:
+	make all
 	go build aguin.go
