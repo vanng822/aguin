@@ -16,7 +16,7 @@ func (t Tags) Get(name string) string {
 
 func GetFieldsTag(o interface{}, tagname string) Tags {
 	st := reflect.TypeOf(o)
-	tags := make(map[string]string, st.NumField())	
+	tags := Tags{}
 	for i := 0; i < st.NumField(); i++ {
 		field := st.Field(i)
 		value := field.Tag.Get(tagname)
