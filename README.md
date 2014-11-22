@@ -28,4 +28,4 @@ You can build running
 
 If you want to run "go command" then just export GOPATH to current working directory, such as
 
-	export GOPATH=$(pwd) && go run aguin.go
+	export GOPATH=$(pwd) && go run aguin.go -pid aguin.pid

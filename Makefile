@@ -31,7 +31,7 @@ gotest:
 	
 gorun:
 	make goinstall
-	go run aguin.go
+	go run aguin.go -pid aguin.pid
 	
 	
 gobuild:
