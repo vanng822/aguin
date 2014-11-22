@@ -6,8 +6,14 @@ import (
 	"fmt"
 )
 
+var loggers = make(map[string]*Logger)
+
 func GetLogger(prefix string) *Logger {
-	return New(prefix)
+	if logger, ok := loggers[prefix]; ok {
+		return logger
+	}
+	loggers[prefix] = New(prefix)
+	return loggers[prefix]	
 }
 
 func New(prefix string) *Logger {
