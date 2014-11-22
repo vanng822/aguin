@@ -60,17 +60,17 @@ func main() {
 	if serverConfig.PidFile != "" {
 		if !force {
 			if _, err := os.Stat(serverConfig.PidFile); err == nil {
+				log.Error("Could not create pid file, error: %v", err)
 				panic(fmt.Sprintf("Pidfile %s exist", serverConfig.PidFile))
 			}
 		}
 		pid := syscall.Getpid()
 		pidf, err := os.Create(serverConfig.PidFile)
 		if err != nil {
-			log.Critical(fmt.Sprintf("Could not create pid file, error: %v", err))
+			log.Error("Could not create pid file, error: %v", err)
 			panic("Could not create pid file")
 		}
 		pidf.WriteString(fmt.Sprintf("%d", pid))
-		log.Error("%v", err)
 	}
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, os.Kill, os.Interrupt, syscall.SIGTERM)
