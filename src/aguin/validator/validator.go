@@ -104,6 +104,7 @@ func ValidateEntity(message map[string]interface{}) EntitySchema {
 
 	result := EntitySchema{}
 	result.Entity = ValidateEntityName(entity)
+	result.Validated = result.Entity != ""
 	for k, v := range data {
 		if !allowedChars.MatchString(k) {
 			errCounter += 1
@@ -137,10 +138,13 @@ func ValidateEntity(message map[string]interface{}) EntitySchema {
 	}
 	if errCounter > 0 {
 		result.Validated = false
-		result.Data = map[string]interface{}{}
 	} else {
-		result.Validated = len(newData) > 0
+		result.Validated = result.Validated && len(newData) > 0
+	}
+	if result.Validated {
 		result.Data = newData
+	} else {
+		result.Data = map[string]interface{}{}
 	}
 	return result
 }

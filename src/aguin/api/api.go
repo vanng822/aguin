@@ -145,7 +145,7 @@ func IndexGet(res http.ResponseWriter, req *http.Request, render render.Render, 
 
 func IndexPost(res http.ResponseWriter, req *http.Request, render render.Render, requestData RequestData, setting AguinSetting) {
 	result := validator.ValidateEntity(requestData.message)
-	if result.Validated && result.Entity != "" {
+	if result.Validated {
 		doc := model.Entity{}
 		doc.Name = result.Entity
 		doc.AppId = requestData.app.Id
