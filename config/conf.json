@@ -1,4 +1,5 @@
 {
 	"Port": 8080,
-	"Host": "127.0.0.1"
+	"Host": "127.0.0.1",
+	"PidFile": "/var/run/aguin.pid"
 }

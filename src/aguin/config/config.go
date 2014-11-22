@@ -14,6 +14,7 @@ type AppConfig struct {
 type ServerConfig struct {
 	Port int
 	Host string
+	PidFile string
 }
 
 var (

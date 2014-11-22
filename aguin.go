@@ -4,25 +4,31 @@ import (
 	aguin_api "aguin/api"
 	"aguin/config"
 	"aguin/model"
+	"aguin/utils"
 	"flag"
 	"fmt"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
 	"net/http"
-	"aguin/utils"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
 	var (
 		configPath string
-		host string
-		port int
+		host       string
+		port       int
+		pidFile    string
+		force      bool
 	)
 	log := utils.GetLogger("system")
 	flag.StringVar(&host, "h", "", "Host to listen on")
 	flag.IntVar(&port, "p", 0, "Port number to listen on")
 	flag.StringVar(&configPath, "c", "", "Path to configurations")
-	
+	flag.StringVar(&pidFile, "pid", "", "Pid file")
+	flag.BoolVar(&force, "f", false, "Force and remove pid file")
 	flag.Parse()
 	if configPath != "" {
 		config.SetConfigPath(configPath)
@@ -45,6 +51,37 @@ func main() {
 	if host != "" {
 		serverConfig.Host = host
 	}
+	if pidFile != "" {
+		serverConfig.PidFile = pidFile
+	}
+
 	log.Info("listening to address %s:%d", serverConfig.Host, serverConfig.Port)
-	http.ListenAndServe(fmt.Sprintf("%s:%d", serverConfig.Host, serverConfig.Port), api)
+
+	if serverConfig.PidFile != "" {
+		if !force {
+			if _, err := os.Stat(serverConfig.PidFile); err == nil {
+				panic(fmt.Sprintf("Pidfile %s exist", serverConfig.PidFile))
+			}
+		}
+		pid := syscall.Getpid()
+		pidf, err := os.Create(serverConfig.PidFile)
+		if err != nil {
+			log.Critical(fmt.Sprintf("Could not create pid file, error: %v", err))
+			panic("Could not create pid file")
+		}
+		pidf.WriteString(fmt.Sprintf("%d", pid))
+		log.Error("%v", err)
+	}
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, os.Kill, os.Interrupt, syscall.SIGTERM)
+	go http.ListenAndServe(fmt.Sprintf("%s:%d", serverConfig.Host, serverConfig.Port), api)
+	sig := <-sigc
+	log.Info("Got signal: %s", sig)
+	if serverConfig.PidFile != "" {
+		log.Info("Cleaning up pid file")
+		err := os.Remove(serverConfig.PidFile)
+		if err != nil {
+			log.Info("Fail to clean up pid file %s", serverConfig.PidFile)
+		}
+	}
 }
