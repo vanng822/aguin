@@ -7,11 +7,10 @@ import (
 type Tags map[string]string
 
 func (t Tags) Get(name string) string {
-	tag, ok := t[name]
-	if !ok {
-		panic(fmt.Sprintf("There no tag for %s", name))
+	if tag, ok := t[name]; ok {
+		return tag
 	}
-	return tag
+	panic(fmt.Sprintf("There no tag for %s", name))
 }
 
 func GetFieldsTag(o interface{}, tagname string) Tags {
