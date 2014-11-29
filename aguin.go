@@ -15,6 +15,16 @@ import (
 	"syscall"
 )
 
+func newMartini() *martini.ClassicMartini {
+	r := martini.NewRouter()
+	m := martini.New()
+	m.Use(martini.Logger())
+	m.Use(martini.Recovery())
+	m.MapTo(r, (*martini.Routes)(nil))
+	m.Action(r.Handle)
+	return &martini.ClassicMartini{m, r}
+}
+
 func main() {
 	var (
 		configPath string
@@ -35,7 +45,7 @@ func main() {
 	}
 	config.ReadConfig()
 	model.EnsureIndex(true)
-	api := martini.Classic()
+	api := newMartini()
 	api.Use(render.Renderer())
 	api.Use(aguin_api.VerifyRequest())
 	api.Get("/", aguin_api.IndexGet)
@@ -71,6 +81,7 @@ func main() {
 			panic("Could not create pid file")
 		}
 		pidf.WriteString(fmt.Sprintf("%d", pid))
+		pidf.Close()
 	}
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, os.Kill, os.Interrupt, syscall.SIGTERM)
