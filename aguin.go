@@ -50,7 +50,7 @@ func main() {
 	api.Use(aguin_api.VerifyRequest())
 	api.Get("/", aguin_api.IndexGet)
 	api.Post("/", aguin_api.IndexPost)
-	api.Options("/", func(res http.ResponseWriter, req *http.Request) {
+	api.Options("/", func(res http.ResponseWriter) {
 		res.Header().Add("Allow", "POST, GET")
 	})
 	api.NotFound(aguin_api.NotFound)
