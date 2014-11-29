@@ -73,11 +73,16 @@ func VerifyRequest() interface{} {
 			return
 		}
 
+		if req.Method == "OPTIONS" {
+			c.Next()
+			return
+		}
+		
 		if req.RequestURI == "/status" {
 			IndexStatus(render)
 			return
 		}
-
+		
 		requestData.app = app
 		setting.conf = config.AppConf()
 		// parse form for data
