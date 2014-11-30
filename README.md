@@ -29,3 +29,17 @@ You can build running
 If you want to run "go command" then just export GOPATH to current working directory, such as
 
 	export GOPATH=$(pwd) && go run aguin.go -pid aguin.pid
+
+
+Init account and add testapp, note down the output (api_key, api_secret, aes_key). You will get the same result if you run for same data again.
+
+	export GOPATH=$(pwd) && go run scripts/init.go -e your.email@fakedomain.tld -n "Your name" -a testapp
+
+Your can send some data by using one of the client lib or send from command line using python client
+	
+	python clients/python/scripts/cli.py -h
+
+But make sure install dependencies
+	
+	cd clients/python/
+	python setup.py develop
