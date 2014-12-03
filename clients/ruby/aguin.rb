@@ -38,24 +38,7 @@ class Aguin
     req = Net::HTTP::Get.new(uri)
     return request(req, uri)
   end
-
-  private
-
-  def request(req, uri)
-    req.initialize_http_header({"User-Agent" => VERSION, "X-AGUIN-API-KEY" => @api_key})
-    http = Net::HTTP.new(uri.host, uri.port)
-    if uri.instance_of? URI::HTTPS
-    http.use_ssl = true
-    end
-    res = http.request(req)
-    bjson = JSON.parse(res.body)
-
-    if bjson["encrypted"]
-    bjson["result"] = decrypt(bjson["result"])
-    end
-    return bjson
-  end
-
+  
   def encrypt(data)
     encrypted = aes_encrypt(JSON.generate(data))
     expected_mac = Base64.urlsafe_encode64(OpenSSL::HMAC::digest(OpenSSL::Digest::SHA256.new, @api_secret, encrypted))
@@ -75,6 +58,23 @@ class Aguin
     raise ArgumentError, "Invalid data"
     end
     return JSON.parse(aes_decrypt(message), {:quirks_mode => true})
+  end
+
+  private
+
+  def request(req, uri)
+    req.initialize_http_header({"User-Agent" => VERSION, "X-AGUIN-API-KEY" => @api_key})
+    http = Net::HTTP.new(uri.host, uri.port)
+    if uri.instance_of? URI::HTTPS
+    http.use_ssl = true
+    end
+    res = http.request(req)
+    bjson = JSON.parse(res.body)
+
+    if bjson["encrypted"]
+    bjson["result"] = decrypt(bjson["result"])
+    end
+    return bjson
   end
 
   def aes_decrypt(message)
