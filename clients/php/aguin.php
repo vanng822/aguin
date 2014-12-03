@@ -70,10 +70,8 @@ class Aguin {
 		if ($method == 'POST') {
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-		} else {
-			if ($data != NULL) {
-				$url = $url . '?'. http_build_query($data);
-			}
+		} else if ($data != NULL) {
+			$url = $url . '?'. http_build_query($data);
 		}
 		
 		curl_setopt($ch, CURLOPT_URL, $url);
