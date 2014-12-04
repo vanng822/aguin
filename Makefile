@@ -27,6 +27,7 @@ gotest:
 	go test aguin/utils
 	go test aguin/crypto
 	go test aguin/validator
+	go test aguin/config
 	
 	
 gorun:
