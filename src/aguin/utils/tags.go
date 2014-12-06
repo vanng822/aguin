@@ -13,7 +13,7 @@ func (t Tags) Get(name string) string {
 	panic(fmt.Sprintf("There no tag for %s", name))
 }
 
-func GetFieldsTag(o interface{}, tagname string) Tags {
+func GetFieldsTag(o interface{}, tagname string) *Tags {
 	st := reflect.TypeOf(o)
 	tags := Tags{}
 	for i := 0; i < st.NumField(); i++ {
@@ -23,5 +23,5 @@ func GetFieldsTag(o interface{}, tagname string) Tags {
 			tags[field.Name] = value
 		}
 	}
-	return tags
+	return &tags
 }

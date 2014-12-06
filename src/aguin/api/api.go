@@ -26,7 +26,7 @@ type AguinSetting struct {
 }
 
 var (
-	entity_bson_tags utils.Tags
+	entity_bson_tags *utils.Tags
 )
 
 func init() {
