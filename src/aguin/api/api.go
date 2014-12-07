@@ -15,7 +15,7 @@ import (
 )
 
 type RequestData struct {
-	app     model.Application
+	app     *model.Application
 	message map[string]interface{}
 }
 
@@ -83,7 +83,7 @@ func VerifyRequest() interface{} {
 			return
 		}
 		
-		requestData.app = app
+		requestData.app = &app
 		setting.conf = config.AppConf()
 		// parse form for data
 		req.ParseForm()
