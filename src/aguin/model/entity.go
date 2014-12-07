@@ -14,6 +14,6 @@ type Entity struct {
 	Data      map[string]interface{} `json:"data" bson:"data"`
 }
 
-func (en *Entity) Save(session *mgo.Session) error {
-	return EntityCollection(session).Insert(en)
+func (e *Entity) Save(session *mgo.Session) error {
+	return EntityCollection(session).Insert(e)
 }

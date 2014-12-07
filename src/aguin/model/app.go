@@ -13,6 +13,6 @@ type Application struct {
 	Description string        `json:"description" bson:"description"`
 }
 
-func (m *Application) Save(session *mgo.Session) error {
-	return AppCollection(session).Insert(m)
+func (a *Application) Save(session *mgo.Session) error {
+	return AppCollection(session).Insert(a)
 }
