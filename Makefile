@@ -1,5 +1,7 @@
 export GOPATH := $(shell pwd)
 
+packages=$(shell ls ./src/aguin/ )
+
 all:
 	make godeps
 	make goinstall
@@ -15,20 +17,11 @@ gotestdeps:
 	go get github.com/stretchr/testify/assert
 
 goinstall:
-	go install aguin/utils
-	go install aguin/config
-	go install aguin/crypto
-	go install aguin/validator
-	go install aguin/model
-	go install aguin/api
+	$(foreach package, ${packages}, go install aguin/$(package) ;)
 	
 
 gotest:
-	go test aguin/utils
-	go test aguin/crypto
-	go test aguin/validator
-	go test aguin/config
-	
+	$(foreach package, ${packages}, go test aguin/$(package) ;)
 	
 gorun:
 	make goinstall
