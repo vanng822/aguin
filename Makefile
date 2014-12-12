@@ -31,3 +31,6 @@ gorun:
 gobuild:
 	make all
 	go build aguin.go
+	
+clean:
+	rm -r pkg/
