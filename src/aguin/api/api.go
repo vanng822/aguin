@@ -33,7 +33,7 @@ func init() {
 	entity_bson_tags = utils.GetFieldsTag(model.Entity{}, "bson")
 }
 
-func VerifyRequest() interface{} {
+func VerifyRequest() martini.Handler {
 	return func(c martini.Context, res http.ResponseWriter, req *http.Request, render render.Render) {
 		log := utils.GetLogger("aguin")
 		// Recover from panic and serve internal server error in json format
