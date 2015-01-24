@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
+	"github.com/vanng822/gopid"
 	"net/http"
 	"os"
 	"os/signal"
@@ -43,6 +44,7 @@ func main() {
 	if configPath != "" {
 		config.SetConfigPath(configPath)
 	}
+	
 	config.ReadConfig()
 	model.EnsureIndex(true)
 	api := newMartini()
@@ -65,34 +67,15 @@ func main() {
 		serverConfig.PidFile = pidFile
 	}
 
-	log.Info("listening to address %s:%d", serverConfig.Host, serverConfig.Port)
-
 	if serverConfig.PidFile != "" {
-		if !force {
-			if _, err := os.Stat(serverConfig.PidFile); err == nil {
-				log.Error("Could not create pid file, error: %v", err)
-				panic(fmt.Sprintf("Pidfile %s exist", serverConfig.PidFile))
-			}
-		}
-		pid := syscall.Getpid()
-		pidf, err := os.Create(serverConfig.PidFile)
-		if err != nil {
-			log.Error("Could not create pid file, error: %v", err)
-			panic("Could not create pid file")
-		}
-		pidf.WriteString(fmt.Sprintf("%d", pid))
-		pidf.Close()
+		gopid.CheckPid(serverConfig.PidFile, force)
+		gopid.CreatePid(serverConfig.PidFile)
+		defer gopid.CleanPid(serverConfig.PidFile)	
 	}
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, os.Kill, os.Interrupt, syscall.SIGTERM)
+	log.Info("listening to address %s:%d", serverConfig.Host, serverConfig.Port)
 	go http.ListenAndServe(fmt.Sprintf("%s:%d", serverConfig.Host, serverConfig.Port), api)
 	sig := <-sigc
 	log.Info("Got signal: %s", sig)
-	if serverConfig.PidFile != "" {
-		log.Info("Cleaning up pid file")
-		err := os.Remove(serverConfig.PidFile)
-		if err != nil {
-			log.Info("Fail to clean up pid file %s", serverConfig.PidFile)
-		}
-	}
 }
